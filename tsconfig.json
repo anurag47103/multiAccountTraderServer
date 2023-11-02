@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+      "moduleResolution": "node",
+      "typeRoots": ["./node_modules/@types", "./types"],
+      "esModuleInterop": true,
+  },
+  "include": [
+      "src/**/*",
+      "types/**/*"
+  ]
+}
