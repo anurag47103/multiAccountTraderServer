@@ -2,9 +2,9 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
-import { getAuthUrl, handleAuthCallback } from './authController';
+import { getAuthUrl, handleAuthCallback } from './controllers/authController';
 import cors from 'cors';
-import {authorizeUpstox} from './upstoxSDK'
+import {authorizeUpstox, getToken} from './controllers/upstoxSDK'
 
 
 dotenv.config();
@@ -18,10 +18,9 @@ app.get('/api',(req, res) => {
 })
 app.get('/api/v1/getAuthUrl', getAuthUrl);
 app.get('/api/v1/authCallback', handleAuthCallback);
+// app.get('/api/v1/authCallback', getToken);
 app.get('/api/v1/authorizeUpstox', authorizeUpstox);
-// app.get('/api/v1/authCallback', (req, res) => {
-//   res.json({'message': 'hey2'})
-// });
+app.get('/api/v1/getToken', getToken);
 
 export default app;
 
