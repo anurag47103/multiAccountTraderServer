@@ -1,0 +1,33 @@
+# Node.js
+node_modules/
+npm-debug.log
+npm-error.log
+
+# TypeScript
+dist/
+*.ts.map
+*.tsbuildinfo
+
+# Git
+.git/
+.gitignore
+
+# Environment files
+.env
+.dockerignore
+Dockerfile
+*.md
+
+# Editor directories and files
+.idea/
+*.swp
+*.swo
+*.sublime*
+.vscode/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Optional: exclude npm lock files, can be included if consistent installs are preferred
+package-lock.json

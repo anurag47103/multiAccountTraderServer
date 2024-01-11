@@ -14,12 +14,8 @@ export const authorizeUpstox = (req:Request, res:Response) => {
   console.log(apiInstance)
   let clientId = config.API_KEY;  
   let redirectUri = config.REDIRECT_URI;  
-  let opts = { 
-    // 'state': "state_example",  
-    // 'scope': "scope_example"  
-  };
   
-  apiInstance.authorize(clientId, redirectUri, apiVersion, opts, (error:any, data:any, response:any) => {
+  apiInstance.authorize(clientId, redirectUri, apiVersion, (error:any, data:any, response:any) => {
     if (error) {
       console.error(error);
     } else {
@@ -55,6 +51,6 @@ export const getToken = (req: Request, res: Response) => {
       console.log('API called successfully');
     }
   });
-
+ 
   res.send();
 }

@@ -1,11 +1,21 @@
 {
   "compilerOptions": {
-      "moduleResolution": "node",
-      "typeRoots": ["./node_modules/@types", "./types"],
-      "esModuleInterop": true
+    "target": "es6",                          // Compile down to ES6
+    "module": "commonjs",                     // Use CommonJS module system
+    "moduleResolution": "node",
+    "outDir": "./dist",                       // Output directory for all emitted files
+    "rootDir": "./src",                       // Root directory of source files
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
+    "resolveJsonModule": true,                // If you're using JSON imports
+    "allowJs": true                           // If you want to allow JavaScript files to be compiled
   },
   "include": [
-      "src/**/*",
-      "types/**/*"
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",                           // Exclude the node_modules directory
+    "**/*.spec.ts",                           // Exclude test files
+    "dist"                                    // Exclude the output directory
   ]
 }

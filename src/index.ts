@@ -1,5 +1,4 @@
-// index.ts
-import  app from './src/server';
+import  app from './server';
 const port: string | number = process.env.PORT || 4001;
 
 app.listen(port, () => {

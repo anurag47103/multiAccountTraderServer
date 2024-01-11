@@ -1,26 +1,19 @@
-// server.ts
-import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
-import path from 'path';
-import { getAuthUrl, handleAuthCallback } from './controllers/authController';
+import express from 'express';
 import cors from 'cors';
-import {authorizeUpstox, getToken} from './controllers/upstoxSDK'
-
-
-dotenv.config();
+import {addUserProperty} from "./middleware/authMiddleware";
+import authRoutes from "./routes/authRoutes";
+import {startWebSocketConnection} from "./controllers/marketFeedController";
+import {startWebSocket} from "./routesHandlers/websocketHandler";
 
 const app: express.Application = express();
 
+app.use(express.json());
 app.use(cors());
+app.use(addUserProperty)
 
-app.get('/api',(req, res) => {
-  res.send('working');
-})
-app.get('/api/v1/getAuthUrl', getAuthUrl);
-app.get('/api/v1/authCallback', handleAuthCallback);
-// app.get('/api/v1/authCallback', getToken);
-app.get('/api/v1/authorizeUpstox', authorizeUpstox);
-app.get('/api/v1/getToken', getToken);
+app.use('/api/v1/auth', authRoutes);
+
+app.post('/api/v1/startWebSocketConnection', startWebSocket)
 
 export default app;
 
