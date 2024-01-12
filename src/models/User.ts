@@ -9,18 +9,22 @@ class User extends Model {
     public email!: string;
     public password!: string;
 
-    public addUpstoxUser = async (upstoxUserData: {
+    public async addUpstoxUser(upstoxUserData: {
         upstoxUserId: string,
         username: string,
         accessToken: string
-    }): Promise<UpstoxUser> => {
-        return UpstoxUser.create({
+    }): Promise<UpstoxUser> {
+        const upstoxUser = await UpstoxUser.create({
             ...upstoxUserData,
-            userId: this.id // Set the foreign key to the current user's id
+            user_id: this.id // Assuming 'UserId' is the foreign key in the 'UpstoxUser' model
         });
+
+        // If you have set up an association, you might need to do something like this instead:
+        // const upstoxUser = await this.createUpstoxUser(upstoxUserData);
+
+        return upstoxUser;
     }
 }
-
 User.init({
     id: {
         type: DataTypes.INTEGER,
@@ -44,4 +48,6 @@ User.init({
     sequelize,
     modelName: 'User'
 });
+
+
 export default User;

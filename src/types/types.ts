@@ -4,13 +4,13 @@ export interface User {
 }
 
 export interface DecodedToken {
-    id: string;
+    user_id: string;
     username: string;
     iat: number;
     exp: number;
 }
 
-export interface UserDetails {
+export interface UpstoxUserDetails {
     email: string,
     exchanges: Array<string>,
     products: Array<string>,

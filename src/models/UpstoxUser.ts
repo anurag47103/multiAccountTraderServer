@@ -1,6 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
 import getSequelize from "../sequelize";
-import User from './User';
 
 const sequelize = getSequelize();
 
@@ -14,6 +13,11 @@ class UpstoxUser extends Model {
 UpstoxUser.init({
     id: {
         primaryKey: true,
+        autoIncrement: true,
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    user_id: {
         type: DataTypes.INTEGER,
         references: { model: 'Users', key: 'id' },
         allowNull: false
@@ -35,7 +39,6 @@ UpstoxUser.init({
     modelName: 'UpstoxUser'
 });
 
-User.hasMany(UpstoxUser, { foreignKey: 'userId' });
-UpstoxUser.belongsTo(User, { foreignKey: 'userId' });
+
 
 export default UpstoxUser;

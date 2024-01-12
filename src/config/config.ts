@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 
-console.log(dotenv);
 dotenv.config({ path: `${__dirname}/../../.env` });
 
 const API_KEY = process.env.API_KEY || '';

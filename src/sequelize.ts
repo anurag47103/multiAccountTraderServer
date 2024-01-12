@@ -14,7 +14,6 @@ export default function getSequelize() : Sequelize {
             },
         )
     }
-    console.log(sequelize)
     return sequelize;
 }
 
@@ -26,9 +25,6 @@ async function checkDatabaseConnection() {
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
-    sequelize.sync({ force: false, alter: true }).then(() => {
-        console.log('All tables were created or updated');
-    });
 }
 
 checkDatabaseConnection();

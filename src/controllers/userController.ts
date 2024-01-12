@@ -27,6 +27,16 @@ export async function findUserByEmail(email: string) {
     }
 }
 
+export async function findUserById(id: number) {
+    try {
+        const user: User = await User.findByPk(id);
+        return user;
+    } catch (error) {
+        console.error('Error finding user by id: ', error);
+    }
+
+}
+
 export async function updateUserEmail(userId: number, newEmail: string) {
     try {
         const user = await User.findByPk(userId);

@@ -1,14 +1,13 @@
 import bcrypt from "bcrypt";
 import {createUser, findUserByEmail} from "../controllers/userController";
-import jwt from "jsonwebtoken";
 import {Request, Response} from "express";
 import config from "../config/config";
 import axios from "axios";
 import {updateAccessToken} from "../services/utilServices";
-import {User} from "../types/types";
-import {getUpstoxUser} from "../services/UserDetailsUpstox";
+import {UpstoxUserDetails, User} from "../types/types";
 import crypto from "crypto";
 import {generateToken} from "../controllers/jwtController";
+import {addUpstoxUser} from "../controllers/upstoxUserController";
 
 export const registerUserHandler = async (req, res) => {
     try {
@@ -38,13 +37,16 @@ export const loginUserHandler = async (req, res) => {
             return res.status(401).json({message: 'Authentication failed: Password not valid'});
         }
 
-        const token = jwt.sign(
-            {userId: user.id, email: user.email},
-            process.env.JWT_SECRET, // Make sure you have defined this in your environment variables
-            {expiresIn: '1h'}
-        );
+        const jwtToken = generateToken(user.id, user.name);
 
-        res.json({token: token, userId: user.id, userName: user.name});
+        res.cookie('token', jwtToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 2 * 60 * 60 * 1000 //2h
+        });
+
+        res.json({message: "logged in "});
     } catch (error) {
         console.error('Error in user login:', error);
         res.status(500).json({message: 'Error logging in user'});
@@ -52,7 +54,6 @@ export const loginUserHandler = async (req, res) => {
 };
 
 export const authCallbackHandler = async (req: Request, res: Response) => {
-    console.log('callback called')
     const { code, state } = req.query;
 
     if (typeof code !== 'string') {
@@ -60,17 +61,7 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
     }
 
     try {
-        const params = {
-            "code": code,
-            "client_id": config.API_KEY,
-            "client_secret": config.API_SECRET,
-            "redirect_uri": config.REDIRECT_URI,
-            "grant_type": "authorization_code",
-        };
-        console.log(config.API_SECRET)
-
         const data = `code=${code}&client_id=${config.API_KEY}&client_secret=${config.API_SECRET}&redirect_uri=${config.REDIRECT_URI}&grant_type=authorization_code`;
-        console.log(data);
 
         const response = await axios({
             method: 'post',
@@ -82,18 +73,15 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
             data: data
         });
 
+        let tempState = state.toString();
+        console.log('tempSate: ' , tempState)
         const { access_token } = response.data;
         updateAccessToken(access_token);
 
-        const user : User = await getUpstoxUser(access_token);
+        const userId = Number(state);
+        const upstoxUser : UpstoxUserDetails = response.data;
 
-        const jwtToken : string = generateToken(user);
-
-        res.cookie('token', jwtToken, {
-            httpOnly: true,  // Makes the cookie inaccessible to client-side JavaScript
-            secure: true,    // Ensures the cookie is only sent over HTTPS
-            sameSite: 'strict' // Helps to mitigate CSRF attacks
-        });
+        addUpstoxUser(access_token, upstoxUser, userId);
 
         res.redirect(`${config.FRONTEND_URI}/dashboard`);
     } catch (error) {
@@ -103,16 +91,15 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
 };
 
 export const getAuthUrlHandler = (req: Request, res: Response) => {
+    const userId : string = req.user.user_id;
+    console.log('getAuthUrlHandler userID: ', userId);
+
     const clientId: string = config.API_KEY;
     const redirectUri: string = config.REDIRECT_URI;
     const responseType: string = 'code';
-    const state: string = generateRandomState();
+    const state: string = userId;
 
     const authUrl: string = `${config.UPSTOX_BASE_URL}/login/authorization/dialog?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
 
     res.json({ authUrl });
-};
-
-const generateRandomState = (): string => {
-    return crypto.randomBytes(16).toString('hex');
 };
