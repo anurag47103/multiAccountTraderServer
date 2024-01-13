@@ -22,3 +22,8 @@ export interface UpstoxUserDetails {
     poa: boolean,
     is_active: boolean
 }
+
+export interface AccountDetails {
+    upstoxUsername: string;
+    upstoxUserId: string;
+};

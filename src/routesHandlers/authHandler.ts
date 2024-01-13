@@ -43,10 +43,10 @@ export const loginUserHandler = async (req, res) => {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
-            maxAge: 2 * 60 * 60 * 1000 //2h
+            maxAge: 24  * 60 * 60 * 1000 //2h
         });
 
-        res.json({message: "logged in "});
+        res.json({user_id: user.id, username: user.name});
     } catch (error) {
         console.error('Error in user login:', error);
         res.status(500).json({message: 'Error logging in user'});
@@ -73,8 +73,6 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
             data: data
         });
 
-        let tempState = state.toString();
-        console.log('tempSate: ' , tempState)
         const { access_token } = response.data;
         updateAccessToken(access_token);
 

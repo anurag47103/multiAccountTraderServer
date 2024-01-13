@@ -17,4 +17,6 @@ router.get('/getAuthUrl', authenticateJWT, getAuthUrlHandler);
 
 router.get('/authCallback', authenticateJWT, authCallbackHandler);
 
+// router.get('verifyToken', )
+
 export default router;
