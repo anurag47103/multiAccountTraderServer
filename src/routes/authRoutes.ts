@@ -2,7 +2,7 @@ import express from 'express';
 import {
     authCallbackHandler,
     getAuthUrlHandler,
-    loginUserHandler,
+    loginUserHandler, logoutUpstoxAccountHandler,
     registerUserHandler
 } from "../routesHandlers/authHandler";
 import {authenticateJWT} from "../middleware/authMiddleware";
@@ -16,6 +16,8 @@ router.post('/login', loginUserHandler);
 router.get('/getAuthUrl', authenticateJWT, getAuthUrlHandler);
 
 router.get('/authCallback', authenticateJWT, authCallbackHandler);
+
+router.delete('/logoutUpstoxAccount', authenticateJWT, logoutUpstoxAccountHandler);
 
 // router.get('verifyToken', )
 

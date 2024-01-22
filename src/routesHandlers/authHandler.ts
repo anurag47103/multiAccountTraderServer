@@ -2,12 +2,13 @@ import bcrypt from "bcrypt";
 import {createUser, findUserByEmail} from "../controllers/userController";
 import {Request, Response} from "express";
 import config from "../config/config";
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import {updateAccessToken} from "../services/utilServices";
 import {UpstoxUserDetails, User} from "../types/types";
 import crypto from "crypto";
 import {generateToken} from "../controllers/jwtController";
-import {addUpstoxUser} from "../controllers/upstoxUserController";
+import {addUpstoxUser, getUpstoxUser, removeUpstoxUser} from "../controllers/upstoxUserController";
+import UpstoxUser from "../models/UpstoxUser";
 
 export const registerUserHandler = async (req, res) => {
     try {
@@ -43,7 +44,7 @@ export const loginUserHandler = async (req, res) => {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
-            maxAge: 24  * 60 * 60 * 1000 //2h
+            maxAge: 24  * 60 * 60 * 1000 //24h
         });
 
         res.json({user_id: user.id, username: user.name});
@@ -61,7 +62,7 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
     }
 
     try {
-        const data = `code=${code}&client_id=${config.API_KEY}&client_secret=${config.API_SECRET}&redirect_uri=${config.REDIRECT_URI}&grant_type=authorization_code`;
+        const data: string = `code=${code}&client_id=${config.API_KEY}&client_secret=${config.API_SECRET}&redirect_uri=${config.REDIRECT_URI}&grant_type=authorization_code`;
 
         const response = await axios({
             method: 'post',
@@ -74,6 +75,7 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
         });
 
         const { access_token } = response.data;
+
         updateAccessToken(access_token);
 
         const userId = Number(state);
@@ -87,6 +89,39 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
         res.status(500).send('Authentication failed.');
     }
 };
+
+export const logoutUpstoxAccountHandler = async(req: Request, res: Response) => {
+
+    try {
+        const logoutUrl: string = `${config.UPSTOX_BASE_URL}/logout`;
+
+        const upstoxUserId = req.query.upstoxUserId;
+
+        if (typeof upstoxUserId !== 'string') {
+            console.error('Invalid UpstoxUserId in logout request');
+            return res.status(400).send('Invalid UpstoxUserId');
+        }
+
+        const upstoxUser: UpstoxUser = await getUpstoxUser(upstoxUserId);
+
+        const access_token: string = upstoxUser.accessToken;
+
+        const response = await axios.delete(logoutUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${access_token}`
+            }
+        });
+
+        const isRemoved = removeUpstoxUser(upstoxUserId);
+
+        console.log('logout response', response.data)
+        res.status(200).json(response.data);
+    } catch(error) {
+        console.error('Error in logging out Upstox User', error);
+        res.status(500).json(error);
+    }
+}
 
 export const getAuthUrlHandler = (req: Request, res: Response) => {
     const userId : string = req.user.user_id;

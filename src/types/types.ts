@@ -27,3 +27,28 @@ export interface AccountDetails {
     upstoxUsername: string;
     upstoxUserId: string;
 };
+
+export interface StockData {
+    instrument_token: string;
+    symbol: string;
+    last_price: number;
+    net_change: number;
+}
+
+export interface StockResponseData {
+    [key: string]: StockData;
+}
+
+
+export interface StockDetails {
+    name: string;
+    exchange: string;
+    price: number;
+    change: number;
+    instrument_key: string;
+}
+
+
+
+
+

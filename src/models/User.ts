@@ -1,8 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
-import getSequelize from '../sequelize';
 import UpstoxUser from './UpstoxUser';
-
-const sequelize = getSequelize();
+import sequelize from '../sequelize'
 class User extends Model {
     public id!: number;
     public name!: string;
@@ -14,15 +12,28 @@ class User extends Model {
         username: string,
         accessToken: string
     }): Promise<UpstoxUser> {
-        const upstoxUser = await UpstoxUser.create({
-            ...upstoxUserData,
-            user_id: this.id // Assuming 'UserId' is the foreign key in the 'UpstoxUser' model
-        });
 
-        // If you have set up an association, you might need to do something like this instead:
-        // const upstoxUser = await this.createUpstoxUser(upstoxUserData);
+        try {
+            console.log(upstoxUserData.upstoxUserId, upstoxUserData.username, upstoxUserData.accessToken);
+            const [upstoxUser, created] = await UpstoxUser.findOrCreate({
+                where: {upstoxUserId: upstoxUserData.upstoxUserId},
+                defaults: {
+                    ...upstoxUserData,
+                    user_id: this.id
+                }
+            });
 
-        return upstoxUser;
+            console.log('created : ', created);
+
+            if (!created) {
+                upstoxUser.accessToken = upstoxUserData.accessToken;
+                await upstoxUser.save();
+            }
+
+            return upstoxUser;
+        } catch(error) {
+            console.error('Error in adding UpstoxUser in user: ', error);
+        }
     }
 }
 User.init({

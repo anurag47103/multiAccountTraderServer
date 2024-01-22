@@ -1,4 +1,3 @@
-// import { UpstoxClient } from 'upstox-js-sdk';
 const UpstoxClient = require('upstox-js-sdk');
 
 import config from '../config/config';
@@ -6,7 +5,11 @@ import { Request, Response } from 'express';
 let defaultClient = UpstoxClient.ApiClient.instance;
 let apiVersion = "2.0";
 let OAUTH2 = defaultClient.authentications["OAUTH2"];
-OAUTH2.accessToken = config.ACCESS_TOKEN;
+
+// (async () => {
+//   OAUTH2.accessToken = await config.getAccessToken();
+// })()
+
 
 export const authorizeUpstox = (req:Request, res:Response) => {
   console.log('request received');

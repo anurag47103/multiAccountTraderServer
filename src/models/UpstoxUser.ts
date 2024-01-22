@@ -1,10 +1,13 @@
-import { Model, DataTypes } from 'sequelize';
-import getSequelize from "../sequelize";
+import {Model, DataTypes, Sequelize} from 'sequelize';
+import sequelize from '../sequelize'
 
-const sequelize = getSequelize();
+if(sequelize == undefined) {
+    console.error('Sequelize instance is undefined : ');
+}
 
 class UpstoxUser extends Model {
     public id!: number;
+    public user_id!: number;
     public upstoxUserId!: string;
     public username!: string;
     public accessToken!: string;
@@ -24,14 +27,15 @@ UpstoxUser.init({
     },
     upstoxUserId: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     username: {
         type: DataTypes.STRING,
         allowNull: false
     },
     accessToken: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1000),
         allowNull: false
     }
 }, {
