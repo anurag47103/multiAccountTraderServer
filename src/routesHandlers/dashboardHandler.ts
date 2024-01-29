@@ -40,7 +40,9 @@ export const getStockDetailsHandler = async (req , res)  => {
             exchange: key.split(':')[0],
             price: data.last_price,
             change: data.net_change,
-            instrument_key: data.instrument_token
+            instrument_key: data.instrument_token,
+            lower_circuit_limit: data.lower_circuit_limit,
+            upper_circuit_limit: data.upper_circuit_limit
         }
     })
 
@@ -48,10 +50,11 @@ export const getStockDetailsHandler = async (req , res)  => {
 }
 
 export const placeOrderHandler = async (req, res) => {
-    const { instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, is_amo, disclosed_quantity, validity, tag} = req.query;
-
+    console.log('request for placeOrder received.')
+    const { instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, is_amo, disclosed_quantity, validity, tag} = req.body;
+    console.log(req.query);
     const response = await placeOrder(instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, is_amo, disclosed_quantity, validity, tag);
-
+    console.log(response);
     res.json(response);
 }
 

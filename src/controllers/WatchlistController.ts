@@ -1,9 +1,11 @@
 import Watchlist from "../models/Watchlist";
+import {sendInstrumentKeys} from "./marketFeedController";
 
 export async function addToWatchlist(instrumentKey: string, userId: number): Promise<boolean> {
     try {
         console.log('userId in addtowatchlist:', userId);
         const newItem = await Watchlist.create({ user_id: userId, instrument_key: instrumentKey });
+        sendInstrumentKeys();
         return true;
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
@@ -18,6 +20,7 @@ export async function removeFromWatchlist(instrumentKey: string, userId: number)
     try {
         await Watchlist.destroy({ where: { user_id : userId, instrument_key: instrumentKey } });
         console.log('Item removed from watchlist');
+        sendInstrumentKeys();
         return true;
     } catch (error) {
         console.error('Error removing from watchlist:', error);

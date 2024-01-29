@@ -33,6 +33,8 @@ export interface StockData {
     symbol: string;
     last_price: number;
     net_change: number;
+    lower_circuit_limit: number;
+    upper_circuit_limit: number;
 }
 
 export interface StockResponseData {
@@ -46,6 +48,8 @@ export interface StockDetails {
     price: number;
     change: number;
     instrument_key: string;
+    lower_circuit_limit: number;
+    upper_circuit_limit: number;
 }
 
 

@@ -13,7 +13,6 @@ export const getStockDetails = async (instrument_key: string) : Promise<StockRes
 
         const getStockDetailsUrl = `${config.UPSTOX_BASE_URL}/market-quote/quotes?instrument_key=${instrument_key}`;
 
-
         const response  = await axios.get(getStockDetailsUrl, {
             headers: {
                 'Accept': 'application/json',
