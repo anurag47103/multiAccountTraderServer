@@ -1,6 +1,6 @@
 import {AccountDetails, StockResponseData, StockDetails} from "../types/types";
 import {getUpstoxUsersForUser} from "../controllers/userController";
-import {getAllHoldings, getStockDetails, placeOrder} from "../controllers/upstoxStockController";
+import {getAllHoldings, getAllOrders, getStockDetails, placeOrder} from "../controllers/upstoxStockController";
 import {
     addToWatchlist,
     getAllWatchlist,
@@ -18,8 +18,7 @@ export const getUpstoxAccountsHandler = async (req, res)  => {
     const accountDetails: AccountDetails[] = upstoxUsers.map((upstoxUser) => {
         return {upstoxUsername: upstoxUser.username, upstoxUserId: upstoxUser.upstoxUserId, isLoggedIn: upstoxUser.isLoggedIn};
     })
-
-    console.log(accountDetails)
+    
     res.json({accountDetails: accountDetails});
 }
 
@@ -147,6 +146,15 @@ export const getAllHoldingsHandler = async(req, res) => {
         res.status(200).json(response);
     } catch(error) {
         res.status(500).send('Error in gettting holdings');
+    }
+}
+
+export const getAllOrdersHandler = async(req, res) => {
+    try { 
+        const response = await getAllOrders();
+        res.status(200).json(response);
+    } catch(error) {
+        res.status(500).send('Error in getting orders.');
     }
 }
 

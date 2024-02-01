@@ -1,7 +1,4 @@
 import { Sequelize } from "sequelize";
-import User from "./models/User";
-import UpstoxUser from "./models/UpstoxUser";
-import Watchlist from "./models/Watchlist";
 import { syncModels } from "./models/syncModels";
 
 
@@ -11,7 +8,8 @@ const sequelize = new Sequelize(
     process.env.POSTGRES_PASSWORD || 'mypassword',
     {
         dialect: 'postgres',
-        host: process.env.HOST || 'localhost'
+        host: process.env.HOST || 'localhost',
+        logging: false
     },
 );
 
@@ -23,5 +21,3 @@ sequelize.authenticate()
     .catch(err => console.log('Error: ' + err));
 
 export default sequelize;
-
-// syncSequelize();

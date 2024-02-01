@@ -3,6 +3,7 @@ import {
     addToWatchlistHandler,
     addUpstoxUserHandler,
     getAllHoldingsHandler,
+    getAllOrdersHandler,
     getStockDetailsHandler,
     getUpstoxAccountsHandler, getWatchlistForUserHandler, getWatchlistHandler,
     placeOrderHandler, removeToWatchlistHandler, removeUpstoxUserHandler
@@ -30,5 +31,7 @@ router.get('/getWatchlist', getWatchlistHandler)
 router.get('/getWatchlistForUser', getWatchlistForUserHandler)
 
 router.get('/getAllHoldings', getAllHoldingsHandler);
+
+router.get('/getAllOrders', getAllOrdersHandler);
 
 export default router;

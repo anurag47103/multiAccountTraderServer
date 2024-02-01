@@ -92,7 +92,7 @@ function broadcastToClients(data: Buffer, wss: WebSocket.Server) {
       client.send(data);
     }
     else {
-      console.log("message not sent")
+      console.error("message not sent")
     }
   });
 }

@@ -39,7 +39,6 @@ export const addUpstoxUserAccessToken = async (access_token: string, upstoxUserI
             upstoxUser.isLoggedIn = true;
             upstoxUser.username = upstoxUserName;
             await upstoxUser.save();
-            console.log('Added upstox user access token successfully');
         } else {
             console.error(`UpstoxUser not found, upstoxUserId: ${upstoxUserId} and user_id: ${user_id}`);
         }

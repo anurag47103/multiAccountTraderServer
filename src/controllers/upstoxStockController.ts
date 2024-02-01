@@ -131,15 +131,18 @@ type Holding = {
   };
 
 type HoldingResponse = {
-    clients: Client[],
+    clients: HoldingClient[],
     overall_pnl : number,
     overall_day_pnl : number,
     overall_invested : number,
     overall_current : number,
+    overall_pnl_percentage: number, 
+    overall_day_pnl_percentage: number,
 }
 
-type Client = {
+type HoldingClient = {
     upstoxUserId: string,
+    upstoxUsername: string,
     holdings: Holding[],
     pnl: Pnl,
 }
@@ -170,8 +173,6 @@ export const getAllHoldings = async () => {
 
         const holdings : Holding[] = await getHoldingsForUpstoxUser(upstoxUser);
 
-        console.log('holdings -> ', holdings)
-
         holdings.forEach(stock => {
             stock.current_value = parseFloat((stock.last_price * stock.quantity).toFixed(2));
             stock.day_pnl = parseFloat(((stock.last_price - stock.close_price) * stock.quantity).toFixed(2));
@@ -179,12 +180,13 @@ export const getAllHoldings = async () => {
 
             pnl += stock.pnl;
             day_pnl += stock.day_pnl;
-            invested = parseFloat(invested + (stock.average_price * stock.quantity).toFixed(2));
+            invested += (stock.average_price * stock.quantity);
             current += stock.current_value;
         });
 
-        const client: Client = {
+        const client: HoldingClient = {
             upstoxUserId: upstoxUser.upstoxUserId,
+            upstoxUsername: upstoxUser.username,
             holdings: holdings,
             pnl: {
                 overall_pnl: pnl,
@@ -204,15 +206,112 @@ export const getAllHoldings = async () => {
         clients.push(client);
     }
 
+    const overall_pnl_percentage = overall_pnl / (overall_invested) * 100;
+    const overall_day_pnl_percentage = overall_day_pnl / overall_invested * 100;
+
     const holdingResponse : HoldingResponse = {
         clients: clients,
         overall_pnl: overall_pnl,
         overall_current: overall_current,
         overall_day_pnl: overall_day_pnl,
-        overall_invested: overall_invested
+        overall_invested: parseFloat(overall_invested.toFixed(2)),
+        overall_pnl_percentage,
+        overall_day_pnl_percentage
     }
 
-    
     return holdingResponse;
+}
 
+type Orders = {
+    exchange: string,
+    product: string,
+    price: number,
+    quantity: number,
+    status: string,
+    instrument_token: string,
+    placed_by: string,
+    trading_symbol: string,
+    order_type: string, 
+    validity: string,
+    trigger_price: number,
+    transaction_type: string,
+    average_price: number,
+    filled_quantity: number,
+    pending_quantity: number,
+    order_id: string,
+    order_timestamp: string,
+    is_amo: boolean
+    order_ref_id: string
+}
+
+type OrderClient = {
+    upstoxUserId: string, 
+    upstoxUsername: string,
+    orders: Orders[]
+}
+
+type OrderResponse = {
+    clients: OrderClient[]
+}
+
+export const getOrdersForUpstoxUser = async (upstoxUser: UpstoxUser) => {
+    try {
+        const getOrdersUrl : string = `${config.UPSTOX_BASE_URL}/order/retrieve-all`
+
+        const response = await axios.get(getOrdersUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${upstoxUser.accessToken}`
+            }
+        });
+        const orders: Orders[] = response.data.map((item: any) => ({
+            isin: item.isin,
+            company_name: item.company_name,
+            product:item.product,
+            quantity: item.quantity,
+            last_price: item.last_price,
+            close_price: item.close_price,
+            pnl: item.pnl,
+            day_change: item.day_change,
+            day_change_percentage: item.day_change_percentage,
+            instrument_token: item.instrument_token,
+            average_price: item.average_price,
+            trading_symbol: item.trading_symbol,
+            exchange: item.exchange
+          }));
+
+          return orders;
+
+    } catch(error) {
+        console.error('Error in getOrdersForUpstoxUser.')
+    }
+}
+export const getAllOrders = async () => {
+    try {
+        const upstoxUsers : UpstoxUser[] = await getAllUpstoxUser();
+
+        let orderClients : OrderClient[] = [];
+        
+        for(const upstoxUser of upstoxUsers) {
+            const orders = await getOrdersForUpstoxUser(upstoxUser);
+
+            const orderClient : OrderClient = {
+                upstoxUserId: upstoxUser.upstoxUserId,
+                upstoxUsername: upstoxUser.username,
+                orders: orders
+            }
+
+            orderClients.push(orderClient);
+        };
+
+        const orderResponse : OrderResponse = {
+            clients: orderClients
+        }
+
+        return orderResponse;
+    }
+     catch(error) {
+        console.error('Error in getAllOrders');
+    }
+    
 }
