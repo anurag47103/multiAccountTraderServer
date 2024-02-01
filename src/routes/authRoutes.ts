@@ -17,7 +17,7 @@ router.get('/getAuthUrl', authenticateJWT, getAuthUrlHandler);
 
 router.get('/authCallback', authenticateJWT, authCallbackHandler);
 
-router.delete('/logoutUpstoxAccount', authenticateJWT, logoutUpstoxAccountHandler);
+router.post('/logoutUpstoxAccount', authenticateJWT, logoutUpstoxAccountHandler);
 
 // router.get('verifyToken', )
 

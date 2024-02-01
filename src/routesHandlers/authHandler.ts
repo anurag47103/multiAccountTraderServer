@@ -7,7 +7,7 @@ import {updateAccessToken} from "../services/utilServices";
 import {UpstoxUserDetails, User} from "../types/types";
 import crypto from "crypto";
 import {generateToken} from "../controllers/jwtController";
-import {addUpstoxUser, getUpstoxUser, removeUpstoxUser} from "../controllers/upstoxUserController";
+import {addUpstoxUser, addUpstoxUserAccessToken, getAccessTokenFromUpstoxUser, getUpstoxUser, logoutUpstoxUser, removeUpstoxUser} from "../controllers/upstoxUserController";
 import UpstoxUser from "../models/UpstoxUser";
 
 export const registerUserHandler = async (req, res) => {
@@ -47,7 +47,7 @@ export const loginUserHandler = async (req, res) => {
             maxAge: 24  * 60 * 60 * 1000 //24h
         });
 
-        res.json({user_id: user.id, username: user.name});
+        res.status(200).json({user_id: user.id, username: user.name});
     } catch (error) {
         console.error('Error in user login:', error);
         res.status(500).json({message: 'Error logging in user'});
@@ -61,8 +61,17 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
         return res.status(400).send('Invalid code received.');
     }
 
+    const [upstoxUserId, userId] = state.toString().split(',');
+
+    
     try {
-        const data: string = `code=${code}&client_id=${config.API_KEY}&client_secret=${config.API_SECRET}&redirect_uri=${config.REDIRECT_URI}&grant_type=authorization_code`;
+        const upstoxUser : UpstoxUser = await getUpstoxUser(upstoxUserId);
+    
+        if(upstoxUser === undefined) {
+            return res.status(401).send('upstoxUserId not valid');
+        }
+
+        const data: string = `code=${code}&client_id=${upstoxUser.apiKey}&client_secret=${upstoxUser.apiSecret}&redirect_uri=${config.REDIRECT_URI}&grant_type=authorization_code`;
 
         const response = await axios({
             method: 'post',
@@ -78,16 +87,42 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
 
         updateAccessToken(access_token);
 
-        const userId = Number(state);
-        const upstoxUser : UpstoxUserDetails = response.data;
+        const upstoxUserDetails : UpstoxUserDetails = response.data;
 
-        addUpstoxUser(access_token, upstoxUser, userId);
-
-        res.redirect(`${config.FRONTEND_URI}/dashboard`);
+        addUpstoxUserAccessToken(access_token, upstoxUserDetails.user_id, upstoxUserDetails.user_name, Number(userId));
+        // res.redirect(`${config.FRONTEND_URI}/dashboard/accounts`);
+        res.status(200).send('successfully logged in');
     } catch (error) {
         console.error('Token exchange failed:', error);
         res.status(500).send('Authentication failed.');
     }
+};
+
+
+export const getAuthUrlHandler = async (req: Request, res: Response) => {
+    const userId : number = req.user.user_id;
+    const { upstoxUserId } = req.query;
+    
+    console.log('getAuthUrlHandler userID: ', userId, upstoxUserId);
+
+    if(!upstoxUserId || typeof upstoxUserId !== 'string') {
+        return res.status(401).end('UpstoxUserId missing in getAuthUrl');
+    }
+
+    const upstoxUser  = await getUpstoxUser(upstoxUserId);
+
+    if(upstoxUser === undefined) {
+        return res.status(401).end('UpstoxUserId not valid');
+    }
+
+    const clientId: string = upstoxUser.apiKey;
+    const redirectUri: string = config.REDIRECT_URI;
+    const responseType: string = 'code';
+    const state: string = `${upstoxUserId},${userId}`;
+
+    const authUrl: string = `${config.UPSTOX_BASE_URL}/login/authorization/dialog?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
+
+    res.json({ authUrl });
 };
 
 export const logoutUpstoxAccountHandler = async(req: Request, res: Response) => {
@@ -95,7 +130,7 @@ export const logoutUpstoxAccountHandler = async(req: Request, res: Response) => 
     try {
         const logoutUrl: string = `${config.UPSTOX_BASE_URL}/logout`;
 
-        const upstoxUserId = req.query.upstoxUserId;
+        const { upstoxUserId } = req.body;
 
         if (typeof upstoxUserId !== 'string') {
             console.error('Invalid UpstoxUserId in logout request');
@@ -113,7 +148,7 @@ export const logoutUpstoxAccountHandler = async(req: Request, res: Response) => 
             }
         });
 
-        const isRemoved = removeUpstoxUser(upstoxUserId);
+        const isLoggedOut = logoutUpstoxUser(upstoxUserId);
 
         console.log('logout response', response.data)
         res.status(200).json(response.data);
@@ -122,17 +157,3 @@ export const logoutUpstoxAccountHandler = async(req: Request, res: Response) => 
         res.status(500).json(error);
     }
 }
-
-export const getAuthUrlHandler = (req: Request, res: Response) => {
-    const userId : string = req.user.user_id;
-    console.log('getAuthUrlHandler userID: ', userId);
-
-    const clientId: string = config.API_KEY;
-    const redirectUri: string = config.REDIRECT_URI;
-    const responseType: string = 'code';
-    const state: string = userId;
-
-    const authUrl: string = `${config.UPSTOX_BASE_URL}/login/authorization/dialog?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
-
-    res.json({ authUrl });
-};

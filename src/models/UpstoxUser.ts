@@ -1,8 +1,8 @@
 import {Model, DataTypes, Sequelize} from 'sequelize';
 import sequelize from '../sequelize'
 
-if(sequelize == undefined) {
-    console.error('Sequelize instance is undefined : ');
+if(sequelize === undefined) {
+    console.error('Sequelize instance is undefined in UpstoxUser: ');
 }
 
 class UpstoxUser extends Model {
@@ -11,6 +11,9 @@ class UpstoxUser extends Model {
     public upstoxUserId!: string;
     public username!: string;
     public accessToken!: string;
+    public apiKey!: string;
+    public apiSecret!: string;
+    public isLoggedIn!: boolean;
 }
 
 UpstoxUser.init({
@@ -32,10 +35,22 @@ UpstoxUser.init({
     },
     username: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     accessToken: {
         type: DataTypes.STRING(1000),
+        allowNull: true
+    },
+    apiKey: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    apiSecret: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    isLoggedIn: {
+        type: DataTypes.BOOLEAN,
         allowNull: false
     }
 }, {

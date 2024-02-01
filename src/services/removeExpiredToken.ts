@@ -4,16 +4,16 @@ import UpstoxUser from "../models/UpstoxUser"; // Replace with the actual import
 export function setupCronJob() {
     cron.schedule('30 3 * * *', async () => {
         try {
-            await UpstoxUser.destroy({
-                where: {},
-                truncate: true // Efficiently delete all rows
-            });
-            console.log('All expired tokens removed');
+            await UpstoxUser.update(
+                { accessToken: null, isLoggedIn: false }, 
+                { where: {} } 
+            );
+            console.log('All UpstoxUser tokens reset');
         } catch (error) {
-            console.error('Error in removing expired tokens:', error);
+            console.error('Error in resetting UpstoxUser tokens:', error);
         }
     }, {
         scheduled: true,
-        timezone: "Asia/Kolkata" // Timezone for Bengaluru, India
+        timezone: "Asia/Kolkata" 
     });
 }

@@ -2,6 +2,7 @@ import { Sequelize } from "sequelize";
 import User from "./models/User";
 import UpstoxUser from "./models/UpstoxUser";
 import Watchlist from "./models/Watchlist";
+import { syncModels } from "./models/syncModels";
 
 
 const sequelize = new Sequelize(
@@ -13,6 +14,13 @@ const sequelize = new Sequelize(
         host: process.env.HOST || 'localhost'
     },
 );
+
+sequelize.authenticate()
+    .then(() => {
+        console.log('Database connected...')
+        // syncModels();
+    })
+    .catch(err => console.log('Error: ' + err));
 
 export default sequelize;
 

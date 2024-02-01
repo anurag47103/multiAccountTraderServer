@@ -1,6 +1,16 @@
+import { syncModels } from './models/syncModels';
 import  app from './server';
-const port: string | number = process.env.PORT || 4001;
+const PORT: string | number = process.env.PORT || 4001;
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}...`);
-});
+const startServer = async () => {
+  try {
+    //   await syncModels(); // Ensure models are synced before starting the server
+      app.listen(PORT, () => {
+          console.log(`Server is running on port ${PORT}`);
+      });
+  } catch (error) {
+      console.error('Failed to start the server:', error);
+  }
+};
+
+startServer();

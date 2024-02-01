@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.syncModels = void 0;
 const sequelize_1 = __importDefault(require("../sequelize"));
 const User_1 = __importDefault(require("./User"));
 const UpstoxUser_1 = __importDefault(require("./UpstoxUser"));
 const Watchlist_1 = __importDefault(require("./Watchlist"));
-(() => __awaiter(void 0, void 0, void 0, function* () {
+const syncModels = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield sequelize_1.default.authenticate();
         console.log('Connection to the database has been established successfully.');
@@ -30,4 +31,5 @@ const Watchlist_1 = __importDefault(require("./Watchlist"));
     catch (error) {
         console.error('Unable to connect to the database:', error);
     }
-}))();
+});
+exports.syncModels = syncModels;

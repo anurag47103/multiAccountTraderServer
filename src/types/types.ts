@@ -4,7 +4,7 @@ export interface User {
 }
 
 export interface DecodedToken {
-    user_id: string;
+    user_id: number;
     username: string;
     iat: number;
     exp: number;
@@ -26,6 +26,7 @@ export interface UpstoxUserDetails {
 export interface AccountDetails {
     upstoxUsername: string;
     upstoxUserId: string;
+    isLoggedIn: boolean;
 };
 
 export interface StockData {

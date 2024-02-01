@@ -1,15 +1,21 @@
 import express, {Router} from 'express';
 import {
     addToWatchlistHandler,
+    addUpstoxUserHandler,
+    getAllHoldingsHandler,
     getStockDetailsHandler,
     getUpstoxAccountsHandler, getWatchlistForUserHandler, getWatchlistHandler,
-    placeOrderHandler, removeToWatchlistHandler
+    placeOrderHandler, removeToWatchlistHandler, removeUpstoxUserHandler
 } from "../routesHandlers/dashboardHandler";
-import {getWatchlistForUser} from "../controllers/WatchlistController";
+import { removeUpstoxUser } from '../controllers/upstoxUserController';
 
 const router: Router = express.Router();
 
 router.get('/getUpstoxAccounts', getUpstoxAccountsHandler);
+
+router.post('/addUpstoxUser', addUpstoxUserHandler);
+
+router.post('/removeUpstoxUser', removeUpstoxUserHandler);
 
 router.get('/getStockDetails', getStockDetailsHandler);
 
@@ -22,4 +28,7 @@ router.post('/removeFromWatchlist', removeToWatchlistHandler);
 router.get('/getWatchlist', getWatchlistHandler)
 
 router.get('/getWatchlistForUser', getWatchlistForUserHandler)
+
+router.get('/getAllHoldings', getAllHoldingsHandler);
+
 export default router;

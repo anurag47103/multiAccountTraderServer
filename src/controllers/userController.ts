@@ -77,13 +77,14 @@ export async function getUpstoxUsersForUser(userId: number): Promise<UpstoxUser[
     try {
         const upstoxUsers = await UpstoxUser.findAll({
             where: {
-                user_id: userId // Match the foreign key column to the user ID
+                user_id: userId 
             }
         });
+        
         return upstoxUsers;
     } catch (error) {
         console.error('Error fetching Upstox users for user:', error);
-        throw error; // Or handle error as appropriate for your application
+        throw error; 
     }
 }
 

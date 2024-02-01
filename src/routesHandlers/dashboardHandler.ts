@@ -1,19 +1,22 @@
 import {AccountDetails, StockResponseData, StockDetails} from "../types/types";
 import {getUpstoxUsersForUser} from "../controllers/userController";
-import {getStockDetails, placeOrder} from "../controllers/upstoxStockController";
+import {getAllHoldings, getStockDetails, placeOrder} from "../controllers/upstoxStockController";
 import {
     addToWatchlist,
     getAllWatchlist,
     getWatchlistForUser,
     removeFromWatchlist
 } from "../controllers/WatchlistController";
+import { isAmo } from "../services/utilServices";
+import UpstoxUser from "../models/UpstoxUser";
+import { addUpstoxUser, removeUpstoxUser } from "../controllers/upstoxUserController";
 
 
 export const getUpstoxAccountsHandler = async (req, res)  => {
-    const upstoxUsers = await getUpstoxUsersForUser(req.user.user_id);
+    const upstoxUsers : UpstoxUser[] = await getUpstoxUsersForUser(req.user.user_id);
 
     const accountDetails: AccountDetails[] = upstoxUsers.map((upstoxUser) => {
-        return {upstoxUsername: upstoxUser.username, upstoxUserId: upstoxUser.upstoxUserId};
+        return {upstoxUsername: upstoxUser.username, upstoxUserId: upstoxUser.upstoxUserId, isLoggedIn: upstoxUser.isLoggedIn};
     })
 
     console.log(accountDetails)
@@ -53,7 +56,15 @@ export const placeOrderHandler = async (req, res) => {
     console.log('request for placeOrder received.')
     const { instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, is_amo, disclosed_quantity, validity, tag} = req.body;
     console.log(req.query);
-    const response = await placeOrder(instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, is_amo, disclosed_quantity, validity, tag);
+
+    let new_is_amo;
+    if(isAmo()) console.log('is amo true');
+    else new_is_amo = false;
+
+    new_is_amo = false;
+
+
+    const response = await placeOrder(instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, new_is_amo, disclosed_quantity, validity, tag);
     console.log(response);
     res.json(response);
 }
@@ -95,3 +106,47 @@ export const getWatchlistForUserHandler = async (req, res) => {
 
      res.status(200).json(formatedResponse);
 }
+
+export const addUpstoxUserHandler = async (req, res) => {
+    try {
+        const {apiKey, apiSecret, name, upstoxId} = req.body;
+
+        if (!apiKey || !apiSecret || !upstoxId) {
+            return res.status(400).json({ message: 'Missing required fields' });
+        }
+
+        const response = addUpstoxUser(req.user.user_id, apiKey, apiSecret, name, upstoxId);
+
+        res.status(201).json({ message: 'User added successfully', data: response});
+
+    } catch (error) {
+        console.error('Error adding user:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const removeUpstoxUserHandler = async(req, res) => {
+    const { upstoxUserId } = req.body;
+    if (typeof upstoxUserId !== 'string') {
+        console.error('Invalid UpstoxUserId in logout request');
+        return res.status(400).send('Invalid UpstoxUserId');
+    }
+
+    try {
+        const isRemoved = removeUpstoxUser(upstoxUserId);
+        res.status(200).send('Upstox user removed');
+    } catch(error) {
+        console.error('Error in removing Upstox User', error);
+        res.status(500).json(error);
+    }
+}
+
+export const getAllHoldingsHandler = async(req, res) => {
+    try {
+        const response = await getAllHoldings();
+        res.status(200).json(response);
+    } catch(error) {
+        res.status(500).send('Error in gettting holdings');
+    }
+}
+

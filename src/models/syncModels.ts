@@ -3,7 +3,7 @@ import User from "./User";
 import UpstoxUser from "./UpstoxUser";
 import Watchlist from "./Watchlist";
 
-(async () => {
+export const syncModels = async () => {
     try {
         await sequelize.authenticate();
         console.log('Connection to the database has been established successfully.');
@@ -18,4 +18,4 @@ import Watchlist from "./Watchlist";
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
-})();
+};
