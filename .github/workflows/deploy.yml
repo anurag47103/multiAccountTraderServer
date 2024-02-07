@@ -57,10 +57,10 @@ jobs:
         VERSION_LABEL: ${{ github.run_number }}-${{ github.sha }} # Unique version label for the deployment
       run: |
         # Zip the EB-config directory
-        zip -r EB-config.zip EB-config Dockerrun.aws.json
+        zip -r deployment-package.zip EB-config/
 
         # Upload the zip file to S3
-        aws s3 cp EB-config.zip s3://$S3_BUCKET/$APPLICATION_NAME/$VERSION_LABEL.zip
+        aws s3 cp deployment-package.zip s3://$S3_BUCKET/$APPLICATION_NAME/$VERSION_LABEL.zip
 
         # Create a new application version with the zipped configuration
         aws elasticbeanstalk create-application-version --application-name $APPLICATION_NAME \
@@ -69,3 +69,4 @@ jobs:
         # Update the Elastic Beanstalk environment to the new version
         aws elasticbeanstalk update-environment --application-name $APPLICATION_NAME \
           --environment-name $ENVIRONMENT_NAME --version-label $VERSION_LABEL
+
