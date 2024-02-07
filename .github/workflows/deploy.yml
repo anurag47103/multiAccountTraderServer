@@ -48,6 +48,9 @@ jobs:
         docker build -t $ECR_REPOSITORY_URI:$IMAGE_TAG .
         docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
 
+    - name: List contents of EB-config
+      run: ls -R EB-config/
+
    # Step 6: Zip EB-config directory and Deploy to AWS Elastic Beanstalk
     - name: Zip and deploy to Elastic Beanstalk
       env:
