@@ -1,13 +1,21 @@
-import { Model, DataTypes } from 'sequelize';
-import getSequelize from "../sequelize";
+import {Model, DataTypes, Sequelize} from 'sequelize';
+import { getSequelizeInstance } from '../sequelize'
 
-const sequelize = getSequelize();
+const sequelize = getSequelizeInstance();
+
+if(!sequelize){
+    console.error('Sequelize instance is empty in watchlist.')
+}
 
 class UpstoxUser extends Model {
     public id!: number;
+    public user_id!: number;
     public upstoxUserId!: string;
     public username!: string;
     public accessToken!: string;
+    public apiKey!: string;
+    public apiSecret!: string;
+    public isLoggedIn!: boolean;
 }
 
 UpstoxUser.init({
@@ -24,14 +32,27 @@ UpstoxUser.init({
     },
     upstoxUserId: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     username: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     accessToken: {
+        type: DataTypes.STRING(1000),
+        allowNull: true
+    },
+    apiKey: {
         type: DataTypes.STRING,
+        allowNull: false,
+    },
+    apiSecret: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    isLoggedIn: {
+        type: DataTypes.BOOLEAN,
         allowNull: false
     }
 }, {

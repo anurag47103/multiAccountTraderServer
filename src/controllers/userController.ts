@@ -61,14 +61,30 @@ export async function deleteUser(userId: number) {
     }
 }
 
-export async function getUserWithUpstoxUsers(userId: number) {
+export async function getUserWithUpstoxUsers(userId: number): Promise<User | null> {
     try {
         const user = await User.findByPk(userId, {
             include: [{ model: UpstoxUser, as: 'upstoxUsers' }],
         });
+
         return user;
     } catch (error) {
         console.error('Error fetching user with Upstox users:', error);
+    }
+}
+
+export async function getUpstoxUsersForUser(userId: number): Promise<UpstoxUser[]> {
+    try {
+        const upstoxUsers = await UpstoxUser.findAll({
+            where: {
+                user_id: userId 
+            }
+        });
+        
+        return upstoxUsers;
+    } catch (error) {
+        console.error('Error fetching Upstox users for user:', error);
+        throw error; 
     }
 }
 
