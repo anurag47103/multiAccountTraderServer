@@ -4,17 +4,19 @@ services:
   app:
     build: .
     ports:
-      - "4001:4001" # Map TCP port 3000 in the container to port 3000 on the Docker host
+      - "4001:4001" 
+      - "8080:8080" # Map TCP port 3000 in the container to port 3000 on the Docker host
     env_file:
-      - ./.env
+      - .env
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=docker
       - DATABASE_URL=postgres://myuser:mypassword@db:5432/mydatabase
     depends_on:
       - db
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./src:/usr/src/app/src
+    command:
+      npx nodemon
 
   db:
     image: postgres:latest

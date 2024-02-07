@@ -1,5 +1,7 @@
-import sequelize from '../sequelize'
 import {Model, DataTypes} from 'sequelize';
+import { getSequelizeInstance } from '../sequelize'
+
+const sequelize = getSequelizeInstance();
 
 if(!sequelize){
     console.error('Sequelize instance is empty in watchlist.')

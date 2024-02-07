@@ -1,12 +1,19 @@
-import sequelize from "../sequelize";
 import User from "./User";
 import UpstoxUser from "./UpstoxUser";
 import Watchlist from "./Watchlist";
 
+import { getSequelizeInstance } from '../sequelize'
+
+const sequelize = getSequelizeInstance();
+
+if(!sequelize){
+    console.error('Sequelize instance is empty in watchlist.')
+}
+
 export const syncModels = async () => {
     try {
         await sequelize.authenticate();
-        console.log('Connection to the database has been established successfully.');
+        console.log('syncing models....');
 
         User.hasMany(UpstoxUser, {foreignKey: 'user_id'});
         UpstoxUser.belongsTo(User, { foreignKey: 'user_id' });

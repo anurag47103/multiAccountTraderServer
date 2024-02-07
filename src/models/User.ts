@@ -1,6 +1,13 @@
 import { Model, DataTypes } from 'sequelize';
 import UpstoxUser from './UpstoxUser';
-import sequelize from '../sequelize'
+import { getSequelizeInstance } from '../sequelize'
+
+const sequelize = getSequelizeInstance();
+
+if(!sequelize){
+    console.error('Sequelize instance is empty in watchlist.')
+}
+
 class User extends Model {
     public id!: number;
     public name!: string;

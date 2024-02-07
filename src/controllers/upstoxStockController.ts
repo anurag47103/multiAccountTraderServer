@@ -264,28 +264,36 @@ export const getOrdersForUpstoxUser = async (upstoxUser: UpstoxUser) => {
                 'Authorization': `Bearer ${upstoxUser.accessToken}`
             }
         });
-        const orders: Orders[] = response.data.map((item: any) => ({
-            isin: item.isin,
-            company_name: item.company_name,
+
+        const orders: Orders[] = response.data.data.map((item: any) => ({
+            exchange:item.exchange,
             product:item.product,
-            quantity: item.quantity,
-            last_price: item.last_price,
-            close_price: item.close_price,
-            pnl: item.pnl,
-            day_change: item.day_change,
-            day_change_percentage: item.day_change_percentage,
-            instrument_token: item.instrument_token,
-            average_price: item.average_price,
-            trading_symbol: item.trading_symbol,
-            exchange: item.exchange
+            price:item.price,
+            quantity:item.quantity,
+            status:item.status,
+            instrument_token:item.instrument_token,
+            placed_by:item.placed_by,
+            trading_symbol:item.trading_symbol,
+            order_type:item.order_type, 
+            validity:item.validity,
+            trigger_price:item.trigger_price,
+            transaction_type:item.transaction_type,
+            average_price:item.average_price,
+            filled_quantity:item.filled_quantity,
+            pending_quantity:item.pending_quantity,
+            order_id:item.order_id,
+            order_timestamp:item.order_timestamp,
+            is_amo:item.is_amo,
+            order_ref_id: item.order_ref_id
           }));
 
           return orders;
 
     } catch(error) {
-        console.error('Error in getOrdersForUpstoxUser.')
+        console.error('Error in getOrdersForUpstoxUser.', error)
     }
 }
+
 export const getAllOrders = async () => {
     try {
         const upstoxUsers : UpstoxUser[] = await getAllUpstoxUser();
@@ -311,7 +319,120 @@ export const getAllOrders = async () => {
         return orderResponse;
     }
      catch(error) {
-        console.error('Error in getAllOrders');
+        console.error('Error in getAllOrders', error);
     }
-    
+}
+
+type Position = {
+    exchange: string;
+    multiplier: number;
+    value: number;
+    pnl: number;
+    product: string;
+    instrument_token: string;
+    average_price: number;
+    quantity: number;
+    last_price: number;
+    close_price: number;
+    buy_price: number;
+    sell_price: number
+    trading_symbol: string;
+};
+
+type PositionResponse = {
+    clients: PositionClient[],
+    overall_pnl : number,
+    overall_pnl_percentage: number, 
+}
+
+type PositionClient = {
+    upstoxUserId: string,
+    upstoxUsername: string,
+    positions: Position[],
+    pnl: PositionPnl,
+}
+
+type PositionPnl = {
+    pnl: number,
+    pnl_percentage: number
+}
+
+export const getPositionsForUpstoxUser = async (upstoxUser: UpstoxUser) => {
+    try {
+        const getPositionsUrl : string = `${config.UPSTOX_BASE_URL}/portfolio/short-term-positions`
+
+        const response = await axios.get(getPositionsUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${upstoxUser.accessToken}`
+            }
+        });
+
+        const positions: Position[] = response.data.data.map((item: any) => ({
+            exchange: item.exchange,
+            multiplier: item.multiplier,
+            value: item.value,
+            pnl: item.pnl,
+            product: item.product,
+            instrument_token: item.instrument_token,
+            average_price: item.average_price,
+            quantity: item.quantity,
+            last_price: item.last_price,
+            close_price: item.close_price,
+            buy_price: item.buy_price,
+            sell_price: item.sell_price,            
+            trading_symbol: item.trading_symbol,
+            realised: item.realised,
+            unrealiesed: item.unrealiesed,
+          }));
+
+          return positions;
+
+    } catch(error) {
+        console.error('Error in getOrdersForUpstoxUser.', error)
+    }
+}
+
+export const getAllPositions = async () => {
+    const upstoxUsers : UpstoxUser[] = await getAllUpstoxUser();
+
+    let clients = [];
+    let overall_pnl = 0;
+    let overall_invested = 0;
+
+    for (const upstoxUser of upstoxUsers) {
+        let pnl = 0;
+        let invested = 0;
+        const positions : Position[] = await getPositionsForUpstoxUser(upstoxUser);
+
+        positions.forEach(stock => {
+            invested += stock.buy_price * stock.quantity;
+            pnl += stock.pnl;
+        });
+
+        const client: PositionClient = {
+            upstoxUserId: upstoxUser.upstoxUserId,
+            upstoxUsername: upstoxUser.username,
+            positions: positions,
+            pnl: {
+                pnl: pnl,
+                pnl_percentage: pnl === 0 || invested === 0 ? 0 : pnl / invested * 10,
+            }
+        }
+
+        overall_pnl += pnl;
+        overall_invested += invested;
+        
+        clients.push(client);  
+    }
+
+    const overall_pnl_percentage = overall_invested === 0 || overall_pnl === 0 ? 0 : overall_pnl / (overall_invested) * 100;
+
+    const positionResponse : PositionResponse = {
+        clients: clients,
+        overall_pnl: overall_pnl,
+        overall_pnl_percentage: overall_pnl_percentage
+    }
+
+    return positionResponse;
 }

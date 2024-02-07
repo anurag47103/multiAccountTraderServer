@@ -1,8 +1,10 @@
 import {Model, DataTypes, Sequelize} from 'sequelize';
-import sequelize from '../sequelize'
+import { getSequelizeInstance } from '../sequelize'
 
-if(sequelize === undefined) {
-    console.error('Sequelize instance is undefined in UpstoxUser: ');
+const sequelize = getSequelizeInstance();
+
+if(!sequelize){
+    console.error('Sequelize instance is empty in watchlist.')
 }
 
 class UpstoxUser extends Model {

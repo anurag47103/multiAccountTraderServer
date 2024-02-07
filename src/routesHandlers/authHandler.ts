@@ -3,12 +3,12 @@ import {createUser, findUserByEmail} from "../controllers/userController";
 import {Request, Response} from "express";
 import config from "../config/config";
 import axios, {AxiosResponse} from "axios";
-import {updateAccessToken} from "../services/utilServices";
 import {UpstoxUserDetails, User} from "../types/types";
 import crypto from "crypto";
 import {generateToken} from "../controllers/jwtController";
 import {addUpstoxUser, addUpstoxUserAccessToken, getAccessTokenFromUpstoxUser, getUpstoxUser, logoutUpstoxUser, removeUpstoxUser} from "../controllers/upstoxUserController";
 import UpstoxUser from "../models/UpstoxUser";
+import { startWebSocketConnection } from "../controllers/marketFeedController";
 
 export const registerUserHandler = async (req, res) => {
     try {
@@ -85,16 +85,14 @@ export const authCallbackHandler = async (req: Request, res: Response) => {
 
         const { access_token } = response.data;
 
-        updateAccessToken(access_token);
-
         const upstoxUserDetails : UpstoxUserDetails = response.data;
 
-        addUpstoxUserAccessToken(access_token, upstoxUserDetails.user_id, upstoxUserDetails.user_name, Number(userId));
-        // res.redirect(`${config.FRONTEND_URI}/dashboard/accounts`);
+        await addUpstoxUserAccessToken(access_token, upstoxUserDetails.user_id, upstoxUserDetails.user_name, Number(userId));
+        startWebSocketConnection();
         res.status(200).send('successfully logged in');
     } catch (error) {
         console.error('Token exchange failed:', error);
-        res.status(500).send('Authentication failed.');
+        res.status(500).send('Authentication failed.').redirect('http://localhost:3000/dashboard/accounts');
     }
 };
 

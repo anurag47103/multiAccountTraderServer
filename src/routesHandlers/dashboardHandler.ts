@@ -1,6 +1,6 @@
 import {AccountDetails, StockResponseData, StockDetails} from "../types/types";
 import {getUpstoxUsersForUser} from "../controllers/userController";
-import {getAllHoldings, getAllOrders, getStockDetails, placeOrder} from "../controllers/upstoxStockController";
+import {getAllHoldings, getAllOrders, getAllPositions, getStockDetails, placeOrder} from "../controllers/upstoxStockController";
 import {
     addToWatchlist,
     getAllWatchlist,
@@ -79,7 +79,7 @@ export const addToWatchlistHandler = async (req, res) => {
     else res.status(500).send('Error in adding the stock to Watchlist');
 }
 
-export const removeToWatchlistHandler = async (req, res) => {
+export const removeFromWatchlistHandler = async (req, res) => {
     const { instrument_key, userId} = req.body;
 
     const response : boolean = await removeFromWatchlist(instrument_key, userId);
@@ -155,6 +155,15 @@ export const getAllOrdersHandler = async(req, res) => {
         res.status(200).json(response);
     } catch(error) {
         res.status(500).send('Error in getting orders.');
+    }
+}
+
+export const getAllPositionsHandler = async(req, res) => {
+    try { 
+        const response = await getAllPositions();
+        res.status(200).json(response);
+    } catch(error) {
+        res.status(500).send('Error in getting positions.');
     }
 }
 

@@ -84,7 +84,7 @@ const connectUpstoxWebSocket = async (wsUrl: string) : Promise<WebSocket> => {
 };
 
 function broadcastToClients(data: Buffer, wss: WebSocket.Server) {
-  // console.log('number of clients connected: ', wss.clients.size);
+  console.log('number of clients connected: ', wss.clients.size);
 
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
@@ -112,6 +112,8 @@ const getMarketFeedUrl = async (): Promise<string> => {
 };
 
 export const startWebSocketConnection = async () : Promise<boolean> => {
+  if(upstoxWebSocket && backendWebSocket) return true;
+
   try {
     const access_token : string | undefined = await config.getAccessToken();
 
@@ -124,18 +126,18 @@ export const startWebSocketConnection = async () : Promise<boolean> => {
 
     const wsUrl = await getMarketFeedUrl();
 
-    const upstoxWs: WebSocket = await connectUpstoxWebSocket(wsUrl);
+    upstoxWebSocket = await connectUpstoxWebSocket(wsUrl);
     console.log('upstox ws working');
 
     await sendInstrumentKeys();
 
-    const wssServer : WebSocket.Server = await connectBackendWebSocket();
+    backendWebSocket = await connectBackendWebSocket();
     console.log('backend ws working')
 
 
-    upstoxWs.on('message', (data: Buffer) => {
+    upstoxWebSocket.on('message', (data: Buffer) => {
       // console.log("message from upstox")
-      broadcastToClients(data, wssServer);
+      broadcastToClients(data, backendWebSocket);
     });
 
     return true;

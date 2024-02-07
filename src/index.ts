@@ -1,10 +1,15 @@
-import { syncModels } from './models/syncModels';
 import  app from './server';
+import { checkSequelizeConnection, getSequelizeInstance } from './sequelize';
+import { syncModels } from './models/syncModels';
+
 const PORT: string | number = process.env.PORT || 4001;
+
 
 const startServer = async () => {
   try {
-    //   await syncModels(); // Ensure models are synced before starting the server
+      const sequelize = getSequelizeInstance();
+      checkSequelizeConnection();
+      syncModels();
       app.listen(PORT, () => {
           console.log(`Server is running on port ${PORT}`);
       });
