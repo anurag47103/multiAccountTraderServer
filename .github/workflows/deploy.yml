@@ -45,8 +45,7 @@ jobs:
         ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }} # Add this to your secrets
         IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
       run: |
-        docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY_URI:$IMAGE_TAG
+        docker build -t $ECR_REPOSITORY_URI:$IMAGE_TAG .
         docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
 
    # Step 6: Zip EB-config directory and Deploy to AWS Elastic Beanstalk
