@@ -25,7 +25,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use('/check', (req, res) => {
-    res.status(200).send("Backend Working");
+    res.status(200).send("Backend Working....");
 })
 
 app.use('/api/v1/auth', authRoutes);

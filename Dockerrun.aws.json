@@ -1,0 +1,15 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "public.ecr.aws/m9v1b0o5/mab-image-repo:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "4001"
+    },
+    {
+      "ContainerPort": "8080"
+    }
+  ]
+}

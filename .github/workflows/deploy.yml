@@ -51,25 +51,24 @@ jobs:
     - name: List contents of EB-config
       run: ls -R EB-config/
 
-   # Step 6: Zip EB-config directory and Deploy to AWS Elastic Beanstalk
-    - name: Zip and deploy to Elastic Beanstalk
+   # Step 6: Deploy to AWS Elastic Beanstalk using Dockerrun.aws.json
+    - name: deploy to Elastic Beanstalk
       env:
         APPLICATION_NAME: mab-server                   # Your Elastic Beanstalk Application Name
         ENVIRONMENT_NAME: Mab-server-env               # Your Elastic Beanstalk Environment Name
         S3_BUCKET: ${{ secrets.S3_BUCKET }}            # Your S3 Bucket where the zip file will be stored
         VERSION_LABEL: ${{ github.run_number }}-${{ github.sha }} # Unique version label for the deployment
       run: |
-        # Zip the EB-config directory
-        zip -r deployment-package.zip EB-config/
+        # Zip the Dockerrun.aws.json file
+        zip deployment-package.zip Dockerrun.aws.json
 
         # Upload the zip file to S3
         aws s3 cp deployment-package.zip s3://$S3_BUCKET/$APPLICATION_NAME/$VERSION_LABEL.zip
 
-        # Create a new application version with the zipped configuration
+        # Create a new application version with the zipped Dockerrun.aws.json
         aws elasticbeanstalk create-application-version --application-name $APPLICATION_NAME \
           --version-label $VERSION_LABEL --source-bundle S3Bucket=$S3_BUCKET,S3Key=$APPLICATION_NAME/$VERSION_LABEL.zip
 
         # Update the Elastic Beanstalk environment to the new version
         aws elasticbeanstalk update-environment --application-name $APPLICATION_NAME \
           --environment-name $ENVIRONMENT_NAME --version-label $VERSION_LABEL
-
