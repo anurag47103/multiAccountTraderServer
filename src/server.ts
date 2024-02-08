@@ -28,6 +28,10 @@ app.use('/check', (req, res) => {
     res.status(200).send("Backend Working....");
 })
 
+app.use('/', (req, res) => {
+    res.status(200).send('Server is running...')
+})
+
 app.use('/api/v1/auth', authRoutes);
 
 app.use('/api/v1/dashboard', authenticateJWT, dashboardRoutes);
