@@ -2,8 +2,8 @@ import { Sequelize } from "sequelize";
 import { syncModels } from "./models/syncModels";
 import config  from "./config/config";
 
+console.log(process.env)
 console.log('here is postgre host', process.env.POSTGRES_HOST);
-
 let sequelizeInstance = null;
 
 export function getSequelizeInstance() {
