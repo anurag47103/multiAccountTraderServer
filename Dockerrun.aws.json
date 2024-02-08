@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "public.ecr.aws/m9v1b0o5/mab-image-repo:latest",
+    "Name": "<Image_URI>",
     "Update": "true"
   },
   "Ports": [
