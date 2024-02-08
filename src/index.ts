@@ -15,7 +15,7 @@ const startServer = async () => {
       checkSequelizeConnection();
       syncModels();
       app.listen(PORT, () => {
-          console.log(`Server is running on port ${PORT}`);
+          console.log(`Server is running on port:  ${PORT}`);
       });
   } catch (error) {
       console.error('Failed to start the server:', error);
