@@ -2,7 +2,7 @@ import { Sequelize } from "sequelize";
 import { syncModels } from "./models/syncModels";
 import config  from "./config/config";
 
-console.log('here is postgre host', config.POSTGRE_HOST);
+console.log('here is postgre host', process.env.POSTGRES_HOST);
 
 let sequelizeInstance = null;
 
@@ -14,7 +14,7 @@ export function getSequelizeInstance() {
         process.env.POSTGRES_PASSWORD || 'mypassword',
         {
             dialect: 'postgres',
-            host: config.POSTGRE_HOST || 'localhost',
+            host: process.env.POSTGRES_HOST || 'localhost',
             port: 5432,
             dialectOptions: {
                 ssl: {
