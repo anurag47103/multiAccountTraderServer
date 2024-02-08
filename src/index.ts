@@ -4,6 +4,8 @@ import { syncModels } from './models/syncModels';
 
 require('dotenv').config();
 
+console.log('process.env', process.env);
+
 const PORT: string | number = process.env.PORT || 4001;
 
 
