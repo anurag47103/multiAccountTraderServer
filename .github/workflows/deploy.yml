@@ -60,7 +60,7 @@ jobs:
         APPLICATION_NAME: mab-server                   # Your Elastic Beanstalk Application Name
         ENVIRONMENT_NAME: Mab-server-env               # Your Elastic Beanstalk Environment Name
         S3_BUCKET: ${{ secrets.S3_BUCKET }}            # Your S3 Bucket where the zip file will be stored
-        VERSION_LABEL: ${{ github.run_number }}-${{ github.sha }} # Unique version label for the deployment
+        VERSION_LABEL: ${{ github.run_number }}-${{ github.sha }}-$(date '+%Y%m%d%H%M%S')
       run: |
         # Zip the Dockerrun.aws.json file
         zip deployment-package.zip Dockerrun.aws.json
