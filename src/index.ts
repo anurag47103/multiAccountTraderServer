@@ -2,6 +2,8 @@ import  app from './server';
 import { checkSequelizeConnection, getSequelizeInstance } from './sequelize';
 import { syncModels } from './models/syncModels';
 
+require('dotenv').config();
+
 const PORT: string | number = process.env.PORT || 4001;
 
 
