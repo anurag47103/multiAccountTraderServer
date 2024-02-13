@@ -7,6 +7,7 @@ import dashboardRoutes from "./routes/dashboardRoutes";
 import {getCSVData} from "./routesHandlers/requestHandler";
 import {getStockData} from "./services/utilServices";
 import {setupCronJob} from "./services/removeExpiredToken";
+import config from './config/config';
 // import './models/syncModels'
 
 const cookieParser = require('cookie-parser');
@@ -15,10 +16,15 @@ const app: express.Application = express();
 
 setupCronJob();
 
-const corsOptions = {
+// CORS configuration
+const corsOptions = config.NODE_ENV === 'prod' ? {
+    origin: 'https://multi-account-trader-qj3f8dqi0-anurags-projects-d60654b.vercel.app',
+    optionsSuccessStatus: 200 // For legacy browser support
+  } : {
     origin: 'http://localhost:3000',
     credentials: true,
-};
+  };
+  
 app.use(cors(corsOptions));
 
 app.use(cookieParser());
