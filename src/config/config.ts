@@ -15,9 +15,9 @@ const JWT_SECRET = process.env.JWT_SECRET || '';
 const NODE_ENV = process.env.NODE_ENV || 'dev';
 const CSV_FILE_PATH = NODE_ENV === 'dev' ? process.env.CSV_FILE_PATH_LOCAL : process.env.CSV_FILE_PATH_DOCKER;
 const POSTGRE_HOST = NODE_ENV === 'prod' ? process.env.POSTGRES_HOST : NODE_ENV === 'dev' ? 'localhost' : 'db';
-const POSTGRES_DB = process.env.POSTGRE_DB;
-const POSTGRES_USER = process.env.POSTGRE_USER;
-const POSTGRES_PASSWORD = process.env.POSTGRE_PASSWORD;
+const POSTGRES_DB = process.env.POSTGRES_DB;
+const POSTGRES_USER = process.env.POSTGRES_USER;
+const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD;
 
 const getAccessToken = async() : Promise<string | undefined> => {
     const access_token : string | undefined = await getAccessTokenFromUpstoxUser();
