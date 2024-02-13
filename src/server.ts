@@ -18,7 +18,7 @@ setupCronJob();
 
 // CORS configuration
 const corsOptions = config.NODE_ENV === 'prod' ? {
-    origin: 'https://multi-account-trader-qj3f8dqi0-anurags-projects-d60654b.vercel.app',
+    origin: 'https://multi-account-trader.vercel.app',
     optionsSuccessStatus: 200 // For legacy browser support
   } : {
     origin: 'http://localhost:3000',
