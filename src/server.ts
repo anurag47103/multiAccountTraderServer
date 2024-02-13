@@ -16,15 +16,14 @@ const app: express.Application = express();
 
 setupCronJob();
 
-// CORS configuration
-const corsOptions = config.NODE_ENV === 'prod' ? {
-    origin: 'https://multi-account-trader.vercel.app',
-    optionsSuccessStatus: 200 // For legacy browser support
-  } : {
-    origin: 'http://localhost:3000',
+const corsOptions = {
+    origin: config.NODE_ENV === 'prod'
+      ? 'https://multi-account-trader.vercel.app'
+      : 'http://localhost:3000',
     credentials: true,
+    optionsSuccessStatus: 200 // For legacy browser support
   };
-  
+
 app.use(cors(corsOptions));
 
 app.use(cookieParser());
