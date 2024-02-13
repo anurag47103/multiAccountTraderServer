@@ -37,6 +37,10 @@ app.use('/', (req, res) => {
     res.status(200).send('Server is running...')
 })
 
+app.use('/api/v1/auth/getAuthUrlCheck', (req, res) => {
+    res.status(200).send('getAuthUrlCheck working....')
+})
+
 app.use('/api/v1/auth', authRoutes);
 
 app.use('/api/v1/dashboard', authenticateJWT, dashboardRoutes);
