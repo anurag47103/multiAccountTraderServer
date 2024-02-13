@@ -3,6 +3,8 @@ import {getAccessTokenFromUpstoxUser} from "../controllers/upstoxUserController"
 
 dotenv.config({ path: `${__dirname}/../../.env` });
 
+console.log(process.env);
+
 const API_KEY = process.env.API_KEY || '';
 const API_SECRET = process.env.API_SECRET || '';
 const REDIRECT_URI = process.env.REDIRECT_URI || '';

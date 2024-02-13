@@ -3,7 +3,7 @@ name: Deploy to AWS Elastic Beanstalk
 on:
   push:
     branches:
-      - dev # Trigger the workflow on push to the main branch
+      - main # Trigger the workflow on push to the main branch
 
 jobs:
   deploy:
@@ -12,9 +12,14 @@ jobs:
       contents: read
       id-token: write
     steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
     # Step 1: Checkout the repo
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     # Step 2: Get the version label from the GitHub sha
     - name: Get version label
@@ -40,25 +45,34 @@ jobs:
         ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }} # Add this to your secrets
         IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
       run: |
-        docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY_URI:$IMAGE_TAG
+        docker build -t $ECR_REPOSITORY_URI:$IMAGE_TAG .
         docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
 
-   # Step 6: Zip EB-config directory and Deploy to AWS Elastic Beanstalk
-    - name: Zip and deploy to Elastic Beanstalk
+    - name: Update image tag in Dockerrun.aws.json
+      run: |
+        IMAGE_TAG=${{ steps.vars.outputs.sha_short }}
+        sed -i "s|<Image_URI>|${{ secrets.ECR_REPOSITORY_URI }}:$IMAGE_TAG|g" Dockerrun.aws.json
+    
+    # Generate version label
+    - name: Set version label
+      id: version_label
+      run: echo "VERSION_LABEL=${GITHUB_RUN_NUMBER}-$(git rev-parse --short HEAD)-$(date '+%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+   # Step 6: Deploy to AWS Elastic Beanstalk using Dockerrun.aws.json
+    - name: deploy to Elastic Beanstalk
       env:
         APPLICATION_NAME: mab-server                   # Your Elastic Beanstalk Application Name
-        ENVIRONMENT_NAME: Mab-server-env               # Your Elastic Beanstalk Environment Name
+        ENVIRONMENT_NAME: mab-server-env-2               # Your Elastic Beanstalk Environment Name
         S3_BUCKET: ${{ secrets.S3_BUCKET }}            # Your S3 Bucket where the zip file will be stored
-        VERSION_LABEL: ${{ github.run_number }}-${{ github.sha }} # Unique version label for the deployment
+        VERSION_LABEL: ${{ env.VERSION_LABEL }}
       run: |
-        # Zip the EB-config directory
-        zip -r EB-config.zip EB-config Dockerrun.aws.json
+        # Zip the Dockerrun.aws.json file
+        zip deployment-package.zip Dockerrun.aws.json
 
         # Upload the zip file to S3
-        aws s3 cp EB-config.zip s3://$S3_BUCKET/$APPLICATION_NAME/$VERSION_LABEL.zip
+        aws s3 cp deployment-package.zip s3://$S3_BUCKET/$APPLICATION_NAME/$VERSION_LABEL.zip
 
-        # Create a new application version with the zipped configuration
+        # Create a new application version with the zipped Dockerrun.aws.json
         aws elasticbeanstalk create-application-version --application-name $APPLICATION_NAME \
           --version-label $VERSION_LABEL --source-bundle S3Bucket=$S3_BUCKET,S3Key=$APPLICATION_NAME/$VERSION_LABEL.zip
 
