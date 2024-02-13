@@ -29,16 +29,12 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
-app.use('/check', (req, res) => {
+app.get('/check', (req, res) => {
     res.status(200).send("Backend Working....");
 })
 
-app.use('/', (req, res) => {
+app.get('/', (req, res) => {
     res.status(200).send('Server is running...')
-})
-
-app.use('/api/v1/auth/getAuthUrlCheck', (req, res) => {
-    res.status(200).send('getAuthUrlCheck working....')
 })
 
 app.use('/api/v1/auth', authRoutes);
