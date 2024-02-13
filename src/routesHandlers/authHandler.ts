@@ -40,12 +40,20 @@ export const loginUserHandler = async (req, res) => {
 
         const jwtToken = generateToken(user.id, user.name);
 
-        res.cookie('token', jwtToken, {
+        const cookieOptions = config.NODE_ENV === 'prod' ? {
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            maxAge: 24  * 60 * 60 * 1000 //24h
-        });
+            secure: true, // Set Secure flag for production
+            sameSite: 'None', // Required to use Secure flag
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+            domain: 'vercel.app' // Specify the domain where the frontend is hosted
+          } : {
+            httpOnly: true,
+            secure: false, // Not using Secure flag in development
+            sameSite: 'lax', // Lax is suitable for development
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+          };
+          
+          res.cookie('token', jwtToken, cookieOptions);
 
         res.status(200).json({user_id: user.id, username: user.name});
     } catch (error) {
