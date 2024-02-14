@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import UpstoxUser from "../models/UpstoxUser";
 
 // export const getUpstoxUserDetails = async (access_token:string) => {
@@ -19,7 +20,9 @@ import UpstoxUser from "../models/UpstoxUser";
 // }
 export const getAllUpstoxUser = async () => {
     try {
-        const upstoxUsers : UpstoxUser[] = await UpstoxUser.findAll();
+        const upstoxUsers : UpstoxUser[] = await UpstoxUser.findAll({
+            where: {isLoggedIn : true}
+        });
         return upstoxUsers;
     } catch(error) {
         console.error('Error in getting all upstox user');
@@ -94,7 +97,13 @@ export const getUpstoxUser = async(upstoxUserId: string) : Promise<UpstoxUser | 
 
 export const getAccessTokenFromUpstoxUser = async() : Promise<string | undefined> => {
     try {
-        const upstoxUser : UpstoxUser = await UpstoxUser.findOne();
+        const upstoxUser : UpstoxUser = await UpstoxUser.findOne({
+            where: {
+                accessToken: {
+                    [Op.ne]: null // This uses the "not equal" operator to check for non-null values
+                }
+            }
+        });
 
         if(upstoxUser) {
             return upstoxUser.accessToken;

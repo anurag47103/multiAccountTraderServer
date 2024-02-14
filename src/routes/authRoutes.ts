@@ -15,7 +15,7 @@ router.post('/login', loginUserHandler);
 
 router.get('/getAuthUrl', authenticateJWT, getAuthUrlHandler);
 
-router.get('/authCallback', authenticateJWT, authCallbackHandler);
+router.get('/authCallback', authCallbackHandler);
 
 router.post('/logoutUpstoxAccount', authenticateJWT, logoutUpstoxAccountHandler);
 
