@@ -40,22 +40,16 @@ export const loginUserHandler = async (req, res) => {
 
         const jwtToken = generateToken(user.id, user.name);
 
-        const cookieOptions = config.NODE_ENV === 'prod' ? {
-            httpOnly: true,
-            secure: true, // Set Secure flag for production
-            sameSite: 'None', // Required to use Secure flag
-            maxAge: 24 * 60 * 60 * 1000, // 24 hours
-            domain: 'vercel.app' // Specify the domain where the frontend is hosted
-          } : {
-            httpOnly: true,
-            secure: false, // Not using Secure flag in development
-            sameSite: 'lax', // Lax is suitable for development
-            maxAge: 24 * 60 * 60 * 1000 // 24 hours
-          };
-          
-          res.cookie('token', jwtToken, cookieOptions);
+        if(config.NODE_ENV !== 'prod') {
+            res.cookie('token', jwtToken, {
+                httpOnly: true,
+                secure: false, // Not using Secure flag in development
+                sameSite: 'lax', // Lax is suitable for development
+                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            });
+        }
 
-        res.status(200).json({user_id: user.id, username: user.name});
+        res.status(200).json({user_id: user.id, username: user.name, token: jwtToken});
     } catch (error) {
         console.error('Error in user login:', error);
         res.status(500).json({message: 'Error logging in user'});

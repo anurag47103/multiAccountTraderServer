@@ -3,17 +3,18 @@ import { verifyToken } from '../controllers/jwtController';
 import { DecodedToken } from "../types/types";
 
 export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies['token'];
+    const authHeader = req.headers.authorization;
+    console.log(authHeader)
 
-    if (token) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7, authHeader.length); // Extract token after 'Bearer '
         const decoded: DecodedToken = verifyToken(token);
         if (decoded) {
-            // console.log('token verified', decoded);
             req.user = decoded;
             next();
         } else {
             res.sendStatus(403);
-        }
+        } 
     } else {
         console.error('token not valid in url: ', req.url);
         res.sendStatus(401);
