@@ -1,6 +1,6 @@
 import {AccountDetails, StockResponseData, StockDetails} from "../types/types";
 import {getUpstoxUsersForUser} from "../controllers/userController";
-import {getAllHoldings, getAllOrders, getAllPositions, getStockDetails, placeOrder} from "../controllers/upstoxStockController";
+import {getAllHoldings, getAllOrders, getAllPositions, getStockDetails, placeOrderForUpstoxUser} from "../controllers/upstoxStockController";
 import {
     addToWatchlist,
     getAllWatchlist,
@@ -53,19 +53,28 @@ export const getStockDetailsHandler = async (req , res)  => {
 
 export const placeOrderHandler = async (req, res) => {
     console.log('request for placeOrder received.')
-    const { instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, is_amo, disclosed_quantity, validity, tag} = req.body;
-    console.log(req.query);
+    const { instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, is_amo, disclosed_quantity, validity, tag, selectedUsers} = req.body;
 
     let new_is_amo;
     if(isAmo()) console.log('is amo true');
     else new_is_amo = false;
 
-    new_is_amo = false;
+    let success_users = [];
 
+    let success_count = 0;
+    let failed_count = 0;
 
-    const response = await placeOrder(instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, new_is_amo, disclosed_quantity, validity, tag);
-    console.log(response);
-    res.json(response);
+    for(let upstoxUserId of selectedUsers) {
+        const response = await placeOrderForUpstoxUser(instrument_key, quantity, price, order_type, transaction_type, trigger_price, product, new_is_amo, disclosed_quantity, validity, tag, upstoxUserId);
+        if(response.status === 'success') {
+            success_users.push(upstoxUserId);
+            success_count++;
+        }
+        else {
+            failed_count++;
+        }
+    }
+    res.status(200).json({success_count: success_count, failed_count: failed_count, users: success_users});
 }
 
 export const addToWatchlistHandler = async (req, res) => {

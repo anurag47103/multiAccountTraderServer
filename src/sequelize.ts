@@ -11,6 +11,7 @@ export function getSequelizeInstance(): Sequelize {
       dialect: 'postgres',
       host: config.POSTGRE_HOST || 'localhost',
       port: 5432,
+      logging: false
     };
 
     if (config.NODE_ENV === 'prod') {

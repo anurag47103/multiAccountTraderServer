@@ -1,9 +1,7 @@
 import dotenv from 'dotenv';
-import {getAccessTokenFromUpstoxUser} from "../controllers/upstoxUserController";
+import {getAccessTokenFromAnyUpstoxUser} from "../controllers/upstoxUserController";
 
 dotenv.config({ path: `${__dirname}/../../.env` });
-
-console.log(process.env);
 
 const API_KEY = process.env.API_KEY || '';
 const API_SECRET = process.env.API_SECRET || '';
@@ -20,7 +18,7 @@ const POSTGRES_USER = process.env.POSTGRES_USER;
 const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD;
 
 const getAccessToken = async() : Promise<string | undefined> => {
-    const access_token : string | undefined = await getAccessTokenFromUpstoxUser();
+    const access_token : string | undefined = await getAccessTokenFromAnyUpstoxUser();
     return access_token;
 }
 

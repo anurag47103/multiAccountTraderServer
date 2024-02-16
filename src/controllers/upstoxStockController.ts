@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from "axios";
 import {StockResponseData, UpstoxUserDetails} from "../types/types";
 import config from "../config/config";
 import UpstoxUser from "../models/UpstoxUser";
-import { getAllUpstoxUser } from "./upstoxUserController";
+import { getAccessTokenFromUpstoxUser, getAllUpstoxUser } from "./upstoxUserController";
 
 export const getStockDetails = async (instrument_key: string) : Promise<StockResponseData | undefined>  => {
     try {
@@ -31,21 +31,28 @@ export const getStockDetails = async (instrument_key: string) : Promise<StockRes
     }
 }
 
-export async function placeOrder(
+type PlaceOrderResponse = {
+    status:string, 
+    upstoxUserId: string, 
+    orderId: string
+}
+
+export async function placeOrderForUpstoxUser(
                           instrument_key: string,
-                          quantity: number = 1,
-                          price: number = 0,
-                          order_type: string = 'MARKET',
-                          transaction_type: string = 'BUY',
-                          trigger_price: number = 0,
-                          product: string = 'D',
-                          is_amo: boolean = false,
-                          disclosed_quantity: number = 0,
-                          validity: string = 'DAY',
-                          tag: string = 'string') {
+                          quantity: number,
+                          price: number ,
+                          order_type: string,
+                          transaction_type: string,
+                          trigger_price: number ,
+                          product: string,
+                          is_amo: boolean = true,
+                          disclosed_quantity: number ,
+                          validity: string,
+                          tag: string,
+                          upstoxUserId: string) : Promise<PlaceOrderResponse> {
 
     try {
-        const access_token : string = await config.getAccessToken();
+        const access_token : string = await getAccessTokenFromUpstoxUser(upstoxUserId);
 
         const requestBody = {
             instrument_token: instrument_key,
@@ -61,6 +68,8 @@ export async function placeOrder(
             tag: tag
         };
 
+        console.log(requestBody);
+
         const placeOrderUrl = `${config.UPSTOX_BASE_URL}/order/place`;
         const response  = await axios.post(placeOrderUrl, requestBody, {
             headers: {
@@ -69,11 +78,11 @@ export async function placeOrder(
                 'Authorization': `Bearer ${access_token}`
             }
         })
-
-        console.log('order_id: ', response.data.order_id);
-        return response.data.order_id;
+        console.log(response.data)
+        return {status: response.data.status, upstoxUserId: upstoxUserId, orderId: response.data.order_id};
     } catch(error) {
-        console.log('error in placing order: ', error);
+        console.error('error in placing order: ', error);
+        return {status: 'failed', upstoxUserId: upstoxUserId, orderId: null};
     }
 }
 
@@ -88,6 +97,8 @@ export const getHoldingsForUpstoxUser = async (upstoxUser: UpstoxUser) => {
                 'Authorization': `Bearer ${upstoxUser.accessToken}`
             }
         });
+
+        console.log('response for holdings: ', response.data.data);
 
         const holdings: Holding[] = response.data.data.map((item: any) => ({
             isin: item.isin,
@@ -173,6 +184,8 @@ export const getAllHoldings = async () => {
 
         const holdings : Holding[] = await getHoldingsForUpstoxUser(upstoxUser);
 
+        console.log('holdings: ', holdings)
+
         holdings.forEach(stock => {
             stock.current_value = parseFloat((stock.last_price * stock.quantity).toFixed(2));
             stock.day_pnl = parseFloat(((stock.last_price - stock.close_price) * stock.quantity).toFixed(2));
@@ -223,6 +236,8 @@ export const getAllHoldings = async () => {
 }
 
 type Orders = {
+    upstoxUserId: string,
+    upstoxUsername: string,
     exchange: string,
     product: string,
     price: number,
@@ -244,14 +259,9 @@ type Orders = {
     order_ref_id: string
 }
 
-type OrderClient = {
-    upstoxUserId: string, 
-    upstoxUsername: string,
-    orders: Orders[]
-}
 
 type OrderResponse = {
-    clients: OrderClient[]
+    orders: Orders[];
 }
 
 export const getOrdersForUpstoxUser = async (upstoxUser: UpstoxUser) => {
@@ -266,6 +276,8 @@ export const getOrdersForUpstoxUser = async (upstoxUser: UpstoxUser) => {
         });
 
         const orders: Orders[] = response.data.data.map((item: any) => ({
+            upstoxUserId: upstoxUser.upstoxUserId,
+            upstoxUsername: upstoxUser.username,
             exchange:item.exchange,
             product:item.product,
             price:item.price,
@@ -298,22 +310,15 @@ export const getAllOrders = async () => {
     try {
         const upstoxUsers : UpstoxUser[] = await getAllUpstoxUser();
 
-        let orderClients : OrderClient[] = [];
+        let orders : Orders[] = [];
         
         for(const upstoxUser of upstoxUsers) {
-            const orders = await getOrdersForUpstoxUser(upstoxUser);
-
-            const orderClient : OrderClient = {
-                upstoxUserId: upstoxUser.upstoxUserId,
-                upstoxUsername: upstoxUser.username,
-                orders: orders
-            }
-
-            orderClients.push(orderClient);
+            const user_orders : Orders[] = await getOrdersForUpstoxUser(upstoxUser);
+            orders = orders.concat(user_orders);
         };
 
         const orderResponse : OrderResponse = {
-            clients: orderClients
+            orders: orders
         }
 
         return orderResponse;

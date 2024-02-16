@@ -95,13 +95,34 @@ export const getUpstoxUser = async(upstoxUserId: string) : Promise<UpstoxUser | 
     }
 }
 
-export const getAccessTokenFromUpstoxUser = async() : Promise<string | undefined> => {
+export const getAccessTokenFromAnyUpstoxUser = async() : Promise<string | undefined> => {
     try {
         const upstoxUser : UpstoxUser = await UpstoxUser.findOne({
             where: {
                 accessToken: {
                     [Op.ne]: null // This uses the "not equal" operator to check for non-null values
                 }
+            }
+        });
+
+        if(upstoxUser) {
+            return upstoxUser.accessToken;
+        }
+        else {
+            console.error("Error in getting access token as no Upstox User is logged In");
+            return undefined;
+        }
+    } catch (error) {
+        console.error("Error in runing UpstoxUser.findOne()")
+        return undefined;
+    }
+}
+
+export const getAccessTokenFromUpstoxUser = async(upstoxUserId: string) : Promise<string | undefined> => {
+    try {
+        const upstoxUser : UpstoxUser = await UpstoxUser.findOne({
+            where: {
+                upstoxUserId: upstoxUserId
             }
         });
 

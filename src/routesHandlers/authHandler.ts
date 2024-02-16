@@ -6,7 +6,7 @@ import axios, {AxiosResponse} from "axios";
 import {UpstoxUserDetails, User} from "../types/types";
 import crypto from "crypto";
 import {generateToken} from "../controllers/jwtController";
-import {addUpstoxUser, addUpstoxUserAccessToken, getAccessTokenFromUpstoxUser, getUpstoxUser, logoutUpstoxUser, removeUpstoxUser} from "../controllers/upstoxUserController";
+import {addUpstoxUser, addUpstoxUserAccessToken, getAccessTokenFromAnyUpstoxUser, getUpstoxUser, logoutUpstoxUser, removeUpstoxUser} from "../controllers/upstoxUserController";
 import UpstoxUser from "../models/UpstoxUser";
 import { startWebSocketConnection } from "../controllers/marketFeedController";
 
