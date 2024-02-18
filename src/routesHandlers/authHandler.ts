@@ -128,9 +128,12 @@ export const getAuthUrlHandler = async (req: Request, res: Response) => {
 export const logoutUpstoxAccountHandler = async(req: Request, res: Response) => {
 
     try {
+        const { upstoxUserId } = req.body;
+
+        logoutUpstoxUser(upstoxUserId);
+
         const logoutUrl: string = `${config.UPSTOX_BASE_URL}/logout`;
 
-        const { upstoxUserId } = req.body;
 
         if (typeof upstoxUserId !== 'string') {
             console.error('Invalid UpstoxUserId in logout request');
@@ -147,9 +150,7 @@ export const logoutUpstoxAccountHandler = async(req: Request, res: Response) => 
                 'Authorization': `Bearer ${access_token}`
             }
         });
-
-        const isLoggedOut = logoutUpstoxUser(upstoxUserId);
-
+        
         console.log('logout response', response.data)
         res.status(200).json(response.data);
     } catch(error) {

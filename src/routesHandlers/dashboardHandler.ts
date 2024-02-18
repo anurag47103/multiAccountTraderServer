@@ -1,6 +1,6 @@
 import {AccountDetails, StockResponseData, StockDetails} from "../types/types";
 import {getUpstoxUsersForUser} from "../controllers/userController";
-import {getAllHoldings, getAllOrders, getAllPositions, getStockDetails, placeOrderForUpstoxUser} from "../controllers/upstoxStockController";
+import {getAllFunds, getAllHoldings, getAllOrders, getAllPositions, getStockDetails, placeOrderForUpstoxUser} from "../controllers/upstoxStockController";
 import {
     addToWatchlist,
     getAllWatchlist,
@@ -123,7 +123,7 @@ export const addUpstoxUserHandler = async (req, res) => {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        const response = addUpstoxUser(req.user.user_id, apiKey, apiSecret, name, upstoxId);
+        const response = await addUpstoxUser(req.user.user_id, apiKey, apiSecret, name, upstoxId);
 
         res.status(201).json({ message: 'User added successfully', data: response});
 
@@ -170,6 +170,16 @@ export const getAllOrdersHandler = async(req, res) => {
 export const getAllPositionsHandler = async(req, res) => {
     try { 
         const response = await getAllPositions();
+        res.status(200).json(response);
+    } catch(error) {
+        res.status(500).send('Error in getting positions.');
+    }
+}
+
+export const getAllFundsHandler = async(req, res) => {
+    console.log('getAllFundsHandler hit')
+    try { 
+        const response = await getAllFunds();
         res.status(200).json(response);
     } catch(error) {
         res.status(500).send('Error in getting positions.');

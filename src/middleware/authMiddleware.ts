@@ -4,7 +4,6 @@ import { DecodedToken } from "../types/types";
 
 export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    console.log(authHeader)
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7, authHeader.length); // Extract token after 'Bearer '

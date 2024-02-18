@@ -2,6 +2,7 @@ import express, {Router} from 'express';
 import {
     addToWatchlistHandler,
     addUpstoxUserHandler,
+    getAllFundsHandler,
     getAllHoldingsHandler,
     getAllOrdersHandler,
     getAllPositionsHandler,
@@ -9,7 +10,6 @@ import {
     getUpstoxAccountsHandler, getWatchlistForUserHandler, getWatchlistHandler,
     placeOrderHandler, removeFromWatchlistHandler, removeUpstoxUserHandler
 } from "../routesHandlers/dashboardHandler";
-import { removeUpstoxUser } from '../controllers/upstoxUserController';
 
 const router: Router = express.Router();
 
@@ -36,5 +36,7 @@ router.get('/getAllHoldings', getAllHoldingsHandler);
 router.get('/getAllOrders', getAllOrdersHandler);
 
 router.get('/getAllPositions', getAllPositionsHandler);
+
+router.get('/getAllFunds', getAllFundsHandler);
 
 export default router;

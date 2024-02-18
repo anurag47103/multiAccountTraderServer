@@ -150,7 +150,6 @@ export const addUpstoxUser = async (user_id: number, apiKey: string, apiSecret: 
             upstoxUserId: upstoxId,
         });
         
-        console.log('UpstoxUser added successfully:', newUpstoxUser);
         return newUpstoxUser;
     } catch(error) {
         console.error('UpstoxUser added successfully:', error);

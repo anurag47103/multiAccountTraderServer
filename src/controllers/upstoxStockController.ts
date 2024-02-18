@@ -441,3 +441,68 @@ export const getAllPositions = async () => {
 
     return positionResponse;
 }
+
+interface FundsDetails {
+    used_margin: number;
+    payin_amount: number;
+    span_margin: number;
+    adhoc_margin: number;
+    notional_cash: number;
+    available_margin: number;
+    exposure_margin: number;
+  }
+  
+  interface Funds {
+    equity: FundsDetails;
+    commodity: FundsDetails;
+  }
+
+  interface FundsResponse {
+    upstoxUserId: string,
+    upstoxUsername: string,
+    funds: Funds
+  }
+
+
+export const getFundsForUpstoxUser = async(upstoxUser: UpstoxUser) => {
+    try {
+        const getFundsUrl : string = `${config.UPSTOX_BASE_URL}/user/get-funds-and-margin`
+
+        const response = await axios.get(getFundsUrl, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${upstoxUser.accessToken}`
+            }
+        });
+
+        const equity: FundsDetails = response.data.data.equity;
+        const commodity: FundsDetails = response.data.data.commodity;
+
+        const funds : Funds = {equity:equity, commodity: commodity};
+
+        return funds;
+
+    } catch(error) {
+        console.error('Error in getOrdersForUpstoxUser.', error)
+    }
+}
+
+export const getAllFunds = async() => {
+    const upstoxUsers : UpstoxUser[] = await getAllUpstoxUser();
+
+    const fundsResponses : FundsResponse[] = [];
+
+    for (const upstoxUser of upstoxUsers) {
+        const funds: Funds = await getFundsForUpstoxUser(upstoxUser);
+
+        const fundsResponse : FundsResponse = {
+            upstoxUserId: upstoxUser.upstoxUserId, 
+            upstoxUsername: upstoxUser.username,
+            funds: funds
+        }
+
+        fundsResponses.push(fundsResponse);
+    }
+
+    return fundsResponses;
+}
