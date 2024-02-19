@@ -62,7 +62,7 @@ jobs:
     - name: deploy to Elastic Beanstalk
       env:
         APPLICATION_NAME: mab-server                   # Your Elastic Beanstalk Application Name
-        ENVIRONMENT_NAME: mab-server-env-2               # Your Elastic Beanstalk Environment Name
+        ENVIRONMENT_NAME: Mab-server-env-3              # Your Elastic Beanstalk Environment Name
         S3_BUCKET: ${{ secrets.S3_BUCKET }}            # Your S3 Bucket where the zip file will be stored
         VERSION_LABEL: ${{ env.VERSION_LABEL }}
       run: |
