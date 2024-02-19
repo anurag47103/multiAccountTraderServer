@@ -1,6 +1,7 @@
 import  app from './server';
 import { checkSequelizeConnection, getSequelizeInstance } from './sequelize';
 import { syncModels } from './models/syncModels';
+import { createServer } from 'http';
 
 require('dotenv').config();
 
@@ -12,7 +13,8 @@ const startServer = async () => {
       const sequelize = getSequelizeInstance();
       checkSequelizeConnection();
       syncModels();
-      app.listen(PORT, () => {
+      const server = createServer(app);
+      server.listen(PORT, () => {
           console.log(`Server is running on port:  ${PORT}`);
       });
   } catch (error) {
