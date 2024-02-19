@@ -1,6 +1,7 @@
 import config from '../config/config';
 import WebSocket from 'ws';
 import {getAllInstrumentKeys} from "../services/utilServices";
+import { getServer } from '..';
 const Upstox = require('upstox-js-sdk');
 
 let defaultClient = Upstox.ApiClient.instance;
@@ -11,7 +12,7 @@ const connectBackendWebSocket = async () : Promise<WebSocket.Server> => {
 
   return new Promise((resolve, reject) => {
     if(backendWebSocket === null)
-      backendWebSocket = new WebSocket.Server({ port: 8080 });
+      backendWebSocket = new WebSocket.Server({ server: getServer() });
 
     resolve(backendWebSocket);
 
