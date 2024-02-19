@@ -12,7 +12,7 @@ const server = createServer(app);
 
 const startServer = async () => {
   try {
-      const sequelize = getSequelizeInstance();
+      getSequelizeInstance();
       checkSequelizeConnection();
       syncModels();
       
