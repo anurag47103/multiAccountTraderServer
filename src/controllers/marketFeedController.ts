@@ -137,7 +137,7 @@ export const startWebSocketConnection = async () : Promise<boolean> => {
 
 
     upstoxWebSocket.on('message', (data: Buffer) => {
-      // console.log("message from upstox")
+      console.log("message from upstox")
       broadcastToClients(data, backendWebSocket);
     });
 
