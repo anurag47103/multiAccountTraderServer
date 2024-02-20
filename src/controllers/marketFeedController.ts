@@ -85,7 +85,7 @@ const connectUpstoxWebSocket = async (wsUrl: string) : Promise<WebSocket> => {
 };
 
 function broadcastToClients(data: Buffer, wss: WebSocket.Server) {
-  console.log('number of clients connected: ', wss.clients.size);
+  // console.log('number of clients connected: ', wss.clients.size);
 
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
@@ -137,7 +137,7 @@ export const startWebSocketConnection = async () : Promise<boolean> => {
 
 
     upstoxWebSocket.on('message', (data: Buffer) => {
-      console.log("message from upstox")
+      // console.log("message from upstox")
       broadcastToClients(data, backendWebSocket);
     });
 
