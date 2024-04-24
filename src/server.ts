@@ -18,7 +18,7 @@ setupCronJob();
 
 const corsOptions = {
     origin: config.NODE_ENV === 'prod'
-      ? 'https://multi-account-trader.vercel.app'
+      ?['https://multiaccountbroker.store', 'https://www.multiaccountbroker.store']
       : 'http://localhost:3000',
     credentials: true,
     optionsSuccessStatus: 200 // For legacy browser support
