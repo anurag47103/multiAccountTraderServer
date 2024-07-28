@@ -11,10 +11,10 @@ export function getSequelizeInstance(): Sequelize {
       dialect: 'postgres',
       host: config.POSTGRE_HOST || 'localhost',
       port: 5432,
-      logging: false
+      logging: false,
     };
 
-    if (config.NODE_ENV === 'prod') {
+    if (config.NODE_ENV === 'dev' || config.NODE_ENV == 'prod') {
       sequelizeOptions.dialectOptions = {
         ssl: {
           require: true,

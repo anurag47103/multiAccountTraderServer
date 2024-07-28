@@ -3,3 +3,4 @@ node_modules/
 dist/
 .vscode
 .idea
+deploy_to_ecr.sh

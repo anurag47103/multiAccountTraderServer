@@ -12,10 +12,12 @@ const FRONTEND_URI = process.env.FRONTEND_URI || '';
 const JWT_SECRET = process.env.JWT_SECRET || '';
 const NODE_ENV = process.env.NODE_ENV || 'dev';
 const CSV_FILE_PATH = NODE_ENV === 'dev' ? process.env.CSV_FILE_PATH_LOCAL : process.env.CSV_FILE_PATH_DOCKER;
-const POSTGRE_HOST = NODE_ENV === 'prod' ? process.env.POSTGRES_HOST : NODE_ENV === 'dev' ? 'localhost' : 'db';
-const POSTGRES_DB = process.env.POSTGRES_DB;
-const POSTGRES_USER = process.env.POSTGRES_USER;
-const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD;
+const POSTGRE_HOST = NODE_ENV === 'docker' ? 'db' : process.env.POSTGRES_HOST;
+const POSTGRES_DB = NODE_ENV === 'dev' ? process.env.POSTGRES_RDS_DB : process.env.POSTGRES_DB;
+const POSTGRES_USER = NODE_ENV === 'dev' ? process.env.POSTGRES_RDS_USER : process.env.POSTGRES_USER;
+const POSTGRES_PASSWORD =  NODE_ENV === 'dev' ? process.env.POSTGRES_RDS_PASSWORD : process.env.POSTGRES_PASSWORD;
+const RDS_PASSWORD_SECRET_NAME = process.env.RDS_PASSWORD_SECRET_NAME;
+const RDS_PASSWORD_REGION = process.env.RDS_PASSWORD_REGION;
 
 const getAccessToken = async() : Promise<string | undefined> => {
     const access_token : string | undefined = await getAccessTokenFromAnyUpstoxUser();
@@ -36,6 +38,8 @@ export default {
     POSTGRE_HOST,
     POSTGRES_DB,
     POSTGRES_USER,
-    POSTGRES_PASSWORD
+    POSTGRES_PASSWORD,
+    RDS_PASSWORD_SECRET_NAME,
+    RDS_PASSWORD_REGION
 };
 

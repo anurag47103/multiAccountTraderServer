@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",                          // Compile down to ES6
+    "target": "es2017",                          // Compile down to ES6
     "module": "commonjs",                     // Use CommonJS module system
     "moduleResolution": "node",
     "outDir": "./dist",                       // Output directory for all emitted files
